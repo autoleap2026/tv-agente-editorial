@@ -940,6 +940,9 @@ function detectLocation(){
 async function generateImgPrompt(){
   const apiKey=$('api-key').value.trim();
   const title=$('meta-title').value||S.articleText.split('\n')[0]||$('tema').value;
+  const bodyLines=S.articleText.split('\n').filter(function(l){return l.trim()&&l.trim().length>30;});
+  const excerpt=bodyLines.slice(1,4).join(' ').substring(0,500);
+  const context=excerpt?title+'\n\n'+excerpt:title;
   $('img-prompt-text').textContent='Generando prompt...';
   if(!apiKey){
     S.imgPromptText='Photorealistic photograph, 16:9, rural '+detectLocation()+' farmland, Hispanic farmworker, warm golden hour lighting, no text, photojournalism style. Topic: '+title;
@@ -948,7 +951,7 @@ async function generateImgPrompt(){
   try{
     const d=await anthroFetch(apiKey,{
       model:'claude-sonnet-4-20250514',max_tokens:300,
-      messages:[{role:'user',content:'Generate a concise DALL-E 3 image prompt in English for this agricultural news article. Dignified realistic scene of Hispanic farmworkers in '+detectLocation()+'. 16:9 photojournalism style. No text in image. Return ONLY the prompt.\n\nArticle: "'+title+'"'}]
+      messages:[{role:'user',content:'Generate a concise DALL-E 3 image prompt in English for this agricultural news article. The image MUST visually represent the specific subject of the article — if it is about cattle, show cattle; if about a pest or worm, show that; if about equipment, show that. Dignified realistic scene in '+detectLocation()+'. 16:9 photojournalism style. No text in image. Return ONLY the prompt.\n\nARTICLE:\n'+context}]
     });
     S.imgPromptText=(d.content&&d.content[0]&&d.content[0].text)||'Photorealistic, '+detectLocation()+' farmland, Hispanic farmer, golden hour, 16:9, photojournalism style. Topic: '+title;
     $('img-prompt-text').textContent=S.imgPromptText;
@@ -957,6 +960,7 @@ async function generateImgPrompt(){
     $('img-prompt-text').textContent=S.imgPromptText;
   }
 }
+
 
 async function generateDALLE(){
   const openaiKey=$('openai-key').value.trim();
