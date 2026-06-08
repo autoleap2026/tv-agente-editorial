@@ -231,16 +231,12 @@ a{color:var(--verde)}
 
   <div class="sidebar-section">
     <div class="sidebar-label">Claves API</div>
-    <div class="field" style="margin-bottom:10px">
-      <label>Anthropic</label>
-      <input type="password" id="api-key" placeholder="sk-ant-..." style="font-size:12px;padding:7px 10px" oninput="saveKey('anthropic',this.value)"/>
-      <div class="key-saved" id="saved-anthropic">✓ Guardada</div>
+    <div style="padding:10px 12px;background:#e8f5f4;border-radius:10px;font-size:12px;color:#155c55">
+      ✓ <strong>Anthropic + OpenAI</strong><br/>
+      <span style="font-size:11px;color:#666">Configuradas en el servidor</span>
     </div>
-    <div class="field" style="margin-bottom:10px">
-      <label>OpenAI (DALL-E)</label>
-      <input type="password" id="openai-key" placeholder="sk-..." style="font-size:12px;padding:7px 10px" oninput="saveKey('openai',this.value)"/>
-      <div class="key-saved" id="saved-openai">✓ Guardada</div>
-    </div>
+    <input type="hidden" id="api-key" value="server"/>
+    <input type="hidden" id="openai-key" value="server"/>
   </div>
 
   <div class="sidebar-divider"></div>
