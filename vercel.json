@@ -2,6 +2,6 @@
   "rewrites": [
     { "source": "/api/anthropic", "destination": "/api/anthropic" },
     { "source": "/api/openai", "destination": "/api/openai" },
-    { "source": "/(.*)", "destination": "/public/index.html" }
+    { "source": "/(.*)", "destination": "/index.html" }
   ]
 }
