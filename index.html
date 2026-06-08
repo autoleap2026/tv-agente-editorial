@@ -534,17 +534,17 @@ a{color:var(--verde)}
         <div class="interactive-card" id="ic-tabla" onclick="selectInteractive('tabla')">
           <div class="ic-header"><span style="font-size:16px">📊</span><span class="ic-title">Tabla interactiva</span></div>
           <div class="ic-preview" id="ic-preview-tabla"></div>
-          <div class="ic-actions"><span style="font-size:11px;color:var(--text-muted)">Datos del artículo</span><button class="btn btn-outline btn-sm" style="font-size:11px;padding:4px 10px" onclick="event.stopPropagation();previewFull('tabla')">Ver completo</button></div>
+          <div class="ic-actions"><span style="font-size:11px;color:var(--text-muted)">Datos del artículo</span><button class="btn btn-outline btn-sm" style="font-size:11px;padding:4px 10px" onclick="event.stopPropagation();previewFull('tabla')">Ver completo</button><button class="btn btn-outline btn-sm" style="font-size:11px;padding:4px 10px;margin-left:4px" onclick="event.stopPropagation();downloadInteractive('tabla')">&#11015; Descargar</button></div>
         </div>
         <div class="interactive-card" id="ic-infografia" onclick="selectInteractive('infografia')">
           <div class="ic-header"><span style="font-size:16px">📈</span><span class="ic-title">Infografía animada</span></div>
           <div class="ic-preview" id="ic-preview-infografia"></div>
-          <div class="ic-actions"><span style="font-size:11px;color:var(--text-muted)">Visual + datos</span><button class="btn btn-outline btn-sm" style="font-size:11px;padding:4px 10px" onclick="event.stopPropagation();previewFull('infografia')">Ver completo</button></div>
+          <div class="ic-actions"><span style="font-size:11px;color:var(--text-muted)">Visual + datos</span><button class="btn btn-outline btn-sm" style="font-size:11px;padding:4px 10px" onclick="event.stopPropagation();previewFull('infografia')">Ver completo</button><button class="btn btn-outline btn-sm" style="font-size:11px;padding:4px 10px;margin-left:4px" onclick="event.stopPropagation();downloadInteractive('infografia')">&#11015; Descargar</button></div>
         </div>
         <div class="interactive-card" id="ic-juego" onclick="selectInteractive('juego')">
           <div class="ic-header"><span style="font-size:16px" id="ic-juego-emoji">🎮</span><span class="ic-title" id="ic-juego-title">Juego interactivo</span></div>
           <div class="ic-preview" id="ic-preview-juego"></div>
-          <div class="ic-actions"><span style="font-size:11px;color:var(--text-muted)" id="ic-juego-sub">Se elige al generar</span><button class="btn btn-outline btn-sm" style="font-size:11px;padding:4px 10px" onclick="event.stopPropagation();previewFull('juego')">Ver completo</button></div>
+          <div class="ic-actions"><span style="font-size:11px;color:var(--text-muted)" id="ic-juego-sub">Se elige al generar</span><button class="btn btn-outline btn-sm" style="font-size:11px;padding:4px 10px" onclick="event.stopPropagation();previewFull('juego')">Ver completo</button><button class="btn btn-outline btn-sm" style="font-size:11px;padding:4px 10px;margin-left:4px" onclick="event.stopPropagation();downloadInteractive('juego')">&#11015; Descargar</button></div>
         </div>
       </div>
       <div id="interactive-selected-msg" class="hidden" style="padding:10px 14px;background:var(--verde-light);border-radius:var(--radius);font-size:13px;color:var(--verde-dark);margin-bottom:14px">
@@ -1470,6 +1470,20 @@ function resetAll(){
   hide('interactive-selected-msg');
 }
 
+function downloadInteractive(type){
+  var html=S.interactiveHTMLs[type];
+  if(!html){alert('Genera el elemento interactivo primero.');return;}
+  var labels={tabla:'tabla-interactiva',infografia:'infografia-animada',juego:'juego-interactivo'};
+  var slug=($('meta-slug')&&$('meta-slug').value)||'articulo';
+  var filename=slug+'-'+labels[type]+'.html';
+  var full='<!DOCTYPE html><html lang="es"><head><meta charset="UTF-8"><title>'+labels[type]+'</title></head><body style="margin:0;padding:20px;font-family:sans-serif">'+html+'</body></html>';
+  var blob=new Blob([full],{type:'text/html'});
+  var a=document.createElement('a');
+  a.href=URL.createObjectURL(blob);
+  a.download=filename;
+  a.click();
+  URL.revokeObjectURL(a.href);
+}
 window.addEventListener('DOMContentLoaded',loadKeys);
 </script>
 </body>
