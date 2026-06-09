@@ -336,6 +336,7 @@ a{color:var(--verde)}
       <div><div class="card-title">Artículo generado</div><div class="card-subtitle">Edita directamente en el campo de texto</div></div>
       <div style="margin-left:auto;display:flex;align-items:center;gap:10px">
         <span id="word-badge" class="status-pill pill-info" style="font-size:12px">— palabras</span>
+        <span id="sentence-warning" style="display:none;font-size:12px;color:#B45309;background:#FEF3C7;padding:4px 10px;border-radius:20px;border:1px solid #F59E0B"></span>
         <button class="btn btn-outline btn-sm" onclick="copyText(document.getElementById('article-editable').value,'btn-copy-art')" id="btn-copy-art">📋 Copiar texto</button>
       </div>
     </div>
@@ -671,7 +672,7 @@ a{color:var(--verde)}
 function D(s){return decodeURIComponent(atob(s).split('').map(c=>'%'+('00'+c.charCodeAt(0).toString(16)).slice(-2)).join(''));}
 
 // Spanish string constants — base64 encoded so JS source is pure ASCII
-const SYSTEM_PROMPT = D("RXJlcyBlbCByZWRhY3RvciBkZSBsYSBzZWNjacOzbiBkZSBBZ3JpY3VsdHVyYSBkZSBRdcOpIFBhc2EgTWVkaWEgKHF1ZXBhc2FtZWRpYS5jb20pLCBlbCBwcmluY2lwYWwgbWVkaW8gZW4gZXNwYcOxb2wgcGFyYSBsYSBjb211bmlkYWQgaGlzcGFuYSBkZSBDYXJvbGluYSBkZWwgTm9ydGUuCgpHVcONQSBFRElUT1JJQUw6ClZPWjogQW1pZ28gaW5mb3JtYWRvIHF1ZSBleHBsaWNhLCBubyBleHBlcnRvIHF1ZSBhbGVjY2lvbmEuIEPDoWxpZG8sIGRpcmVjdG8sIHByw6FjdGljby4gRW1ww6F0aWNvIGNvbiBlbCB0cmFiYWphZG9yIGFncsOtY29sYSBoaXNwYW5vLiBFc3Bhw7FvbCBuZXV0cm8gbGF0aW5vYW1lcmljYW5vLgoKTEVOR1VBSkU6IFByaW1lcmEgbWVuY2nDs24gZGUgc2lnbGFzOiBub21icmUgY29tcGxldG8gZW4gZXNwYcOxb2wgKyBzaWdsYS4gRWo6ICJTZXJ2aWNpbyBkZSBDb25zZXJ2YWNpw7NuIGRlIFJlY3Vyc29zIE5hdHVyYWxlcyAoTlJDUywgcG9yIHN1cyBzaWdsYXMgZW4gaW5nbMOpcykiLiBEYXRlbGluZSAiUmFsZWlnaC4tIiBwYXJhIG5vdGFzLCByZXBvcnRhamVzIHkgYXJ0w61jdWxvcyBkZSBwcm9ncmFtYS4gTm8gcGFyYSBndcOtYXMgcHLDoWN0aWNhcy4KClDDgVJSQUZPUzogTcOheGltbyA0LTUgb3JhY2lvbmVzLiBVbmEgaWRlYSBwb3IgcMOhcnJhZm8uIE9yYWNpb25lcyBjb3J0YXMgeSBhY3RpdmFzLgoKVElQT1M6Ci0gVGlwbyAxICgzMDAtNTAwIHBhbGFicmFzKTogUGlyw6FtaWRlIGludmVydGlkYS4gQW51bmNpbyAtPiBwb3IgcXXDqSBpbXBvcnRhIC0+IGxpc3RhIGRlIHByaW9yaWRhZGVzIC0+IGNpdGEgLT4gY29udGV4dG8uCi0gVGlwbyAyICg0MDAtNjUwIHBhbGFicmFzKTogQ29udGV4dG8vcHJvYmxlbWEgLT4gZGVmaW5pY2nDs24gLT4gYmVuZWZpY2lvcyAobGlzdGEpIC0+IGPDs21vIGFwbGljYXIgLT4gZWplbXBsb3MgTkMgLT4gY2llcnJlIGxhcmdvIHBsYXpvLgotIFRpcG8gMyAoNDUwLTcwMCBwYWxhYnJhcyk6IFF1w6kgZXMgLT4gcXVpw6luIGFwbGljYSAobm90YSBzaSBhcGxpY2Egc2luIGVzdGF0dXMpIC0+IHBhc29zIC0+IGRvY3VtZW50b3MgLT4gdGVzdGltb25pbyAtPiBjb250YWN0by4KLSBUaXBvIDQgKDUwMC05MDAgcGFsYWJyYXMpOiBOYXJyYXRpdmEgaHVtYW5hLiBQZXJzb25hamUgY2VudHJhbC4gQ2l0YXMgcHJpbWVyYSBwZXJzb25hLiBDaWVycmUgZGUgZGlnbmlkYWQuCi0gVGlwbyA1ICg0MDAtNjAwIHBhbGFicmFzKTogRGF0b3MgY2xhdmUgZmlsdHJhZG9zIC0+IGFuw6FsaXNpcyBkZSBpbXBhY3RvIC0+IHBlcnNwZWN0aXZhIHByw6FjdGljYSBwYXJhIE5DLgoKVElUVUxBUkVTOiBNaW7DunNjdWxhIHNhbHZvIG5vbWJyZXMgcHJvcGlvcy4gTcOheGltbyAxNCBwYWxhYnJhcy4KQ0lFUlJFOiBTaWVtcHJlIGNvbiBhY2Npw7NuIGNvbmNyZXRhIG8gYmVuZWZpY2lvIGEgbGFyZ28gcGxhem8uCkZPUk1BVE86IEVudHJlZ2EgU09MTyBlbCBhcnTDrWN1bG8uIFByaW1lcmEgbMOtbmVhID0gdGl0dWxhci4gTmFkYSBtw6FzLg==");
+const SYSTEM_PROMPT = D("RXJlcyBlbCByZWRhY3RvciBkZSBsYSBzZWNjacOzbiBkZSBBZ3JpY3VsdHVyYSBkZSBRdcOpIFBhc2EgTWVkaWEgKHF1ZXBhc2FtZWRpYS5jb20pLCBlbCBwcmluY2lwYWwgbWVkaW8gZW4gZXNwYcOxb2wgcGFyYSBsYSBjb211bmlkYWQgaGlzcGFuYSBkZSBDYXJvbGluYSBkZWwgTm9ydGUuCgpHVcONQSBFRElUT1JJQUw6ClZPWjogQW1pZ28gaW5mb3JtYWRvIHF1ZSBleHBsaWNhLCBubyBleHBlcnRvIHF1ZSBhbGVjY2lvbmEuIEPDoWxpZG8sIGRpcmVjdG8sIHByw6FjdGljby4gRW1ww6F0aWNvIGNvbiBlbCB0cmFiYWphZG9yIGFncsOtY29sYSBoaXNwYW5vLiBFc3Bhw7FvbCBuZXV0cm8gbGF0aW5vYW1lcmljYW5vLgoKTEVOR1VBSkU6IFByaW1lcmEgbWVuY2nDs24gZGUgc2lnbGFzOiBub21icmUgY29tcGxldG8gZW4gZXNwYcOxb2wgKyBzaWdsYS4gRWo6ICJTZXJ2aWNpbyBkZSBDb25zZXJ2YWNpw7NuIGRlIFJlY3Vyc29zIE5hdHVyYWxlcyAoTlJDUywgcG9yIHN1cyBzaWdsYXMgZW4gaW5nbMOpcykiLiBEYXRlbGluZSAiUmFsZWlnaC4tIiBwYXJhIG5vdGFzLCByZXBvcnRhamVzIHkgYXJ0w61jdWxvcyBkZSBwcm9ncmFtYS4gTm8gcGFyYSBndcOtYXMgcHLDoWN0aWNhcy4KClDDgVJSQUZPUzogTcOheGltbyA0LTUgb3JhY2lvbmVzLiBVbmEgaWRlYSBwb3IgcMOhcnJhZm8uIE9yYWNpb25lcyBjb3J0YXMgeSBhY3RpdmFzLgoKVElQT1M6Ci0gVGlwbyAxICgzMDAtNTAwIHBhbGFicmFzKTogUGlyw6FtaWRlIGludmVydGlkYS4gQW51bmNpbyAtPiBwb3IgcXXDqSBpbXBvcnRhIC0+IGxpc3RhIGRlIHByaW9yaWRhZGVzIC0+IGNpdGEgLT4gY29udGV4dG8uCi0gVGlwbyAyICg0MDAtNjUwIHBhbGFicmFzKTogQ29udGV4dG8vcHJvYmxlbWEgLT4gZGVmaW5pY2nDs24gLT4gYmVuZWZpY2lvcyAobGlzdGEpIC0+IGPDs21vIGFwbGljYXIgLT4gZWplbXBsb3MgTkMgLT4gY2llcnJlIGxhcmdvIHBsYXpvLgotIFRpcG8gMyAoNDUwLTcwMCBwYWxhYnJhcyk6IFF1w6kgZXMgLT4gcXVpw6luIGFwbGljYSAobm90YSBzaSBhcGxpY2Egc2luIGVzdGF0dXMpIC0+IHBhc29zIC0+IGRvY3VtZW50b3MgLT4gdGVzdGltb25pbyAtPiBjb250YWN0by4KLSBUaXBvIDQgKDUwMC05MDAgcGFsYWJyYXMpOiBOYXJyYXRpdmEgaHVtYW5hLiBQZXJzb25hamUgY2VudHJhbC4gQ2l0YXMgcHJpbWVyYSBwZXJzb25hLiBDaWVycmUgZGUgZGlnbmlkYWQuCi0gVGlwbyA1ICg0MDAtNjAwIHBhbGFicmFzKTogRGF0b3MgY2xhdmUgZmlsdHJhZG9zIC0+IGFuw6FsaXNpcyBkZSBpbXBhY3RvIC0+IHBlcnNwZWN0aXZhIHByw6FjdGljYSBwYXJhIE5DLgoKVElUVUxBUkVTOiBNaW7DunNjdWxhIHNhbHZvIG5vbWJyZXMgcHJvcGlvcy4gTcOheGltbyAxNCBwYWxhYnJhcy4KQ0lFUlJFOiBTaWVtcHJlIGNvbiBhY2Npw7NuIGNvbmNyZXRhIG8gYmVuZWZpY2lvIGEgbGFyZ28gcGxhem8uCkZPUk1BVE86IEVudHJlZ2EgU09MTyBlbCBhcnTDrWN1bG8uIFByaW1lcmEgbMOtbmVhID0gdGl0dWxhci4gTmFkYSBtw6FzLgpPUkFDSU9ORVM6IE5pbmd1biBvcmFjaW9uIGRlYmUgc3VwZXJhciAyNSBwYWxhYnJhcy4gU2kgdW5hIGlkZWEgcmVxdWllcmUgbWFzLCBkaXZpZGVsYSBlbiBkb3Mgb3JhY2lvbmVzIGNvcnRhcy4=");
 const TIPO_NAMES = JSON.parse(D("WyIiLCJOb3RhIGluZm9ybWF0aXZhIiwiR3XDrWEgcHLDoWN0aWNhIiwiQWNjZXNvIGEgcHJvZ3JhbWEiLCJSZXBvcnRhamUgY29tdW5pdGFyaW8iLCJDb250ZXh0byAvIERhdG9zIl0="));
 const TIPO_EXT  = JSON.parse(D("WyIiLCIzMDAtNTAwIiwiNDAwLTY1MCIsIjQ1MC03MDAiLCI1MDAtOTAwIiwiNDAwLTYwMCJd"));
 
@@ -900,6 +901,8 @@ function populateReview(text){
   $('meta-words').textContent=wc+' palabras';
   $('word-badge').textContent=wc+' palabras';
   $('sources-box').textContent=S.researchContext||'No se consultaron fuentes externas.';
+  // Sentence length check: warn if any sentence exceeds 25 words
+  checkSentenceLengths(text);
 }
 
 function onArticleEdit(){
@@ -1480,13 +1483,24 @@ function downloadInteractive(type){
   var labels={tabla:'tabla-interactiva',infografia:'infografia-animada',juego:'juego-interactivo'};
   var slug=($('meta-slug')&&$('meta-slug').value)||'articulo';
   var filename=slug+'-'+labels[type]+'.html';
-  var full='<!DOCTYPE html><html lang="es"><head><meta charset="UTF-8"><title>'+labels[type]+'</title></head><body style="margin:0;padding:20px;font-family:sans-serif">'+html+'</body></html>';
-  var blob=new Blob([full],{type:'text/html'});
+  var blob=new Blob([html],{type:'text/html'});
   var a=document.createElement('a');
   a.href=URL.createObjectURL(blob);
   a.download=filename;
   a.click();
   URL.revokeObjectURL(a.href);
+}
+function checkSentenceLengths(text){
+  var warningEl=document.getElementById('sentence-warning');
+  if(!warningEl)return;
+  var sentences=text.replace(/\n/g,' ').split(/[.!?]+/).filter(function(s){return s.trim().length>10;});
+  var longOnes=sentences.filter(function(s){return s.trim().split(/\s+/).length>25;});
+  if(longOnes.length>0){
+    warningEl.style.display='block';
+    warningEl.textContent=longOnes.length+' oracion'+(longOnes.length>1?'es superan':'supera')+' los 25 palabras. Revisa antes de publicar.';
+  } else {
+    warningEl.style.display='none';
+  }
 }
 window.addEventListener('DOMContentLoaded',loadKeys);
 </script>
