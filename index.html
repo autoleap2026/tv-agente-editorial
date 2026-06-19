@@ -820,7 +820,7 @@ async function researchTopic(apiKey, tema, fuente){
   const currentYear=new Date().getFullYear();
   const prompt='Research this agricultural topic thoroughly for a Spanish-language article. Search for the most accurate, current official information. TOPIC: '+tema+(fuente?' EDITOR NOTES: '+fuente.substring(0,400):'')+' Search for: (1) If there is an NRCS practice code number mentioned, find the exact official NRCS practice standard for that code (name, definition, purpose, conditions where it applies). (2) Any relevant USDA or NRCS program details, eligibility, and how farmers apply. (3) Any specific data, statistics, or recent announcements related to this topic in North Carolina or the US. Return a structured summary of what you found: exact practice name (if applicable), official definition, key facts, eligibility requirements, and any NC-specific information. Be precise - this will be used as the factual foundation for a news article.';
   const d=await anthroFetch(apiKey,{
-    model:'claude-sonnet-4-20250514',max_tokens:2000,
+    model:'claude-sonnet-4-6',max_tokens:2000,
     tools:[{type:'web_search_20250305',name:'web_search'}],
     messages:[{role:'user',content:prompt}]
   });
@@ -867,7 +867,7 @@ async function generateArticle(){
 
   try{
     const d=await anthroFetch(apiKey,{
-      model:'claude-sonnet-4-20250514',max_tokens:1500,
+      model:'claude-sonnet-4-6',max_tokens:1500,
       system:SYSTEM_PROMPT,
       messages:[{role:'user',content:userMsg}]
     });
@@ -953,7 +953,7 @@ async function generateImgPrompt(){
   }
   try{
     const d=await anthroFetch(apiKey,{
-      model:'claude-sonnet-4-20250514',max_tokens:300,
+      model:'claude-sonnet-4-6',max_tokens:300,
       messages:[{role:'user',content:'Generate a concise DALL-E 3 image prompt in English for this agricultural news article. The image MUST visually represent the specific subject of the article — if it is about cattle, show cattle; if about a pest or worm, show that; if about equipment, show that. Dignified realistic scene in '+detectLocation()+'. 16:9 photojournalism style. No text in image. Return ONLY the prompt.\n\nARTICLE:\n'+context}]
     });
     S.imgPromptText=(d.content&&d.content[0]&&d.content[0].text)||'Photorealistic, '+detectLocation()+' farmland, Hispanic farmer, golden hour, 16:9, photojournalism style. Topic: '+title;
@@ -1047,7 +1047,7 @@ async function generateInteractives(){
   let data = null;
   try{
     const d=await anthroFetch(apiKey,{
-      model:'claude-sonnet-4-20250514',max_tokens:1200,
+      model:'claude-sonnet-4-6',max_tokens:1200,
       messages:[{role:'user',content:'Extract structured data from this agricultural article for interactive widgets. Return ONLY valid JSON, no markdown, no explanation.\n\nARTICLE TITLE: '+title+'\nARTICLE: '+excerpt+'\n\nReturn this exact JSON structure:\n{\n  "tabla":{\n    "titulo":"[table title in Spanish]",\n    "headers":["Col1","Col2","Col3"],\n    "rows":[["val","val","val"],["val","val","val"],["val","val","val"],["val","val","val"],["val","val","val"]]\n  },\n  "infografia":{\n    "titulo":"[infographic title in Spanish]",\n    "stats":[\n      {"emoji":"🌱","valor":"450","sufijo":"+","etiqueta":"[label]"},\n      {"emoji":"💧","valor":"50","sufijo":"%","etiqueta":"[label]"},\n      {"emoji":"🌾","valor":"12","sufijo":"","etiqueta":"[label]"},\n      {"emoji":"📋","valor":"3","sufijo":"","etiqueta":"[label]"}\n    ],\n    "pasos":["Paso 1 description","Paso 2 description","Paso 3 description","Paso 4 description"]\n  },\n  "juego":{\n    "titulo":"[quiz title in Spanish]",\n    "subtitulo":"[quiz subtitle in Spanish]",\n    "preguntas":[\n      {"p":"[question in Spanish]?","ops":["[wrong]","[correct]","[wrong]","[wrong]"],"c":1,"exp":"[brief explanation]"},\n      {"p":"[question]?","ops":["[wrong]","[wrong]","[correct]","[wrong]"],"c":2,"exp":"[explanation]"},\n      {"p":"[question]?","ops":["[correct]","[wrong]","[wrong]","[wrong]"],"c":0,"exp":"[explanation]"},\n      {"p":"[question]?","ops":["[wrong]","[correct]","[wrong]","[wrong]"],"c":1,"exp":"[explanation]"}\n    ]\n  }\n}\n\nRules: Use REAL data from the article. For stats use real numbers. For tabla use relevant columns and data. All text in Spanish.'}]
     });
     let txt=(d.content&&d.content[0]&&d.content[0].text)||'{}';
@@ -1302,7 +1302,7 @@ async function regenerateSEO(){
   const btn=event.target;const orig=btn.textContent;btn.textContent='Generando...';btn.disabled=true;
   try{
     const d=await anthroFetch(apiKey,{
-      model:'claude-sonnet-4-20250514',max_tokens:300,
+      model:'claude-sonnet-4-6',max_tokens:300,
       messages:[{role:'user',content:'Generate SEO metadata in Spanish for this agricultural article about Hispanic farmworkers in '+detectLocation()+'.\n\nTitle: "'+title+'"\nContent: '+excerpt+'\n\nRespond ONLY in JSON (no markdown):\n{"seo_title":"[max 60 chars]","meta_description":"[max 160 chars]","tags":"[5-8 comma-separated Spanish tags]","slug":"[url-friendly, no accents, max 60 chars]"}'}]
     });
     let txt=(d.content&&d.content[0]&&d.content[0].text)||'{}';
@@ -1330,7 +1330,7 @@ async function regenerateSocial(platform){
     :'Instagram post: short hook + 8-12 hashtags (#TierraViva #AgriculturaNC #HispanosEnElCampo #CarolinaDelNorte #QuePassaMedia required). End with "Link en bio".';
   try{
     const d=await anthroFetch(apiKey,{
-      model:'claude-sonnet-4-20250514',max_tokens:250,
+      model:'claude-sonnet-4-6',max_tokens:250,
       messages:[{role:'user',content:'Write a social media post in Spanish for Que Pasa Media, serving Hispanic agricultural communities in '+detectLocation()+'.\n\nARTICLE: "'+title+'"\nEXCERPT: '+excerpt+'\n\nRULE: '+rule+'\n\nReturn ONLY the post text.'}]
     });
     const txt=(d.content&&d.content[0]&&d.content[0].text)||'';
@@ -1355,7 +1355,7 @@ async function generateSocialCopies(){
   }
   try{
     const d=await anthroFetch(apiKey,{
-      model:'claude-sonnet-4-20250514',max_tokens:600,
+      model:'claude-sonnet-4-6',max_tokens:600,
       messages:[{role:'user',content:'Generate two social media posts in Spanish for Que Pasa Media (serving Hispanic agricultural communities in '+detectLocation()+').\n\nARTICLE TITLE: '+title+'\nEXCERPT: '+excerpt+'\n\nRULES:\n- Warm, helpful tone for Hispanic community\n- Include #TierraViva in both\n- Facebook: 150-250 chars + 5-7 hashtags, can include emoji, informative tone\n- Instagram: short hook + 8-12 hashtags (#TierraViva #AgriculturaNC #HispanosEnElCampo #CarolinaDelNorte #QuePassaMedia required) + "Link en bio" at end\n\nRespond ONLY in JSON without markdown:\n{"fb":"...","ig":"..."}'}]
     });
     let txt=(d.content&&d.content[0]&&d.content[0].text)||'{}';
