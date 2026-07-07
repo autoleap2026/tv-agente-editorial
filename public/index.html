@@ -497,17 +497,17 @@ a{color:var(--verde)}
         <div class="interactive-card" id="ic-tabla" onclick="selectInteractive('tabla')">
           <div class="ic-header"><span style="font-size:16px">📊</span><span class="ic-title">Tabla interactiva</span></div>
           <div class="ic-preview" id="ic-preview-tabla"></div>
-          <div class="ic-actions"><span style="font-size:11px;color:var(--text-muted)">Datos del artículo</span><button class="btn btn-outline btn-sm" style="font-size:11px;padding:4px 10px" onclick="event.stopPropagation();previewFull('tabla')">Ver completo</button><button class="btn btn-outline btn-sm" style="font-size:11px;padding:4px 10px;margin-left:4px" onclick="event.stopPropagation();downloadInteractive('tabla')">&#11015; Descargar</button><button class="btn btn-outline btn-sm" style="font-size:11px;padding:4px 10px;margin-left:4px" onclick="event.stopPropagation();copyInteractive('tabla')">&#128203; Copiar</button></div>
+          <div class="ic-actions"><span style="font-size:11px;color:var(--text-muted)">Datos del artículo</span><button class="btn btn-outline btn-sm" style="font-size:11px;padding:4px 10px" onclick="event.stopPropagation();previewFull('tabla')">Ver completo</button><button class="btn btn-outline btn-sm" style="font-size:11px;padding:4px 10px;margin-left:4px" onclick="event.stopPropagation();downloadInteractive('tabla')">&#11015; Descargar</button><button class="btn btn-outline btn-sm" style="font-size:11px;padding:4px 10px;margin-left:4px" onclick="event.stopPropagation();copyInteractive('tabla')">&#128203; Copiar</button><button class="btn btn-outline btn-sm" id="tv-regen-tabla" style="font-size:11px;padding:4px 10px;margin-left:4px" onclick="event.stopPropagation();regenerateOne('tabla')">&#128260; Otro</button></div>
         </div>
         <div class="interactive-card" id="ic-infografia" onclick="selectInteractive('infografia')">
           <div class="ic-header"><span style="font-size:16px">📈</span><span class="ic-title">Infografía animada</span></div>
           <div class="ic-preview" id="ic-preview-infografia"></div>
-          <div class="ic-actions"><span style="font-size:11px;color:var(--text-muted)">Visual + datos</span><button class="btn btn-outline btn-sm" style="font-size:11px;padding:4px 10px" onclick="event.stopPropagation();previewFull('infografia')">Ver completo</button><button class="btn btn-outline btn-sm" style="font-size:11px;padding:4px 10px;margin-left:4px" onclick="event.stopPropagation();downloadInteractive('infografia')">&#11015; Descargar</button><button class="btn btn-outline btn-sm" style="font-size:11px;padding:4px 10px;margin-left:4px" onclick="event.stopPropagation();copyInteractive('infografia')">&#128203; Copiar</button></div>
+          <div class="ic-actions"><span style="font-size:11px;color:var(--text-muted)">Visual + datos</span><button class="btn btn-outline btn-sm" style="font-size:11px;padding:4px 10px" onclick="event.stopPropagation();previewFull('infografia')">Ver completo</button><button class="btn btn-outline btn-sm" style="font-size:11px;padding:4px 10px;margin-left:4px" onclick="event.stopPropagation();downloadInteractive('infografia')">&#11015; Descargar</button><button class="btn btn-outline btn-sm" style="font-size:11px;padding:4px 10px;margin-left:4px" onclick="event.stopPropagation();copyInteractive('infografia')">&#128203; Copiar</button><button class="btn btn-outline btn-sm" id="tv-regen-infografia" style="font-size:11px;padding:4px 10px;margin-left:4px" onclick="event.stopPropagation();regenerateOne('infografia')">&#128260; Otro</button></div>
         </div>
         <div class="interactive-card" id="ic-juego" onclick="selectInteractive('juego')">
           <div class="ic-header"><span style="font-size:16px" id="ic-juego-emoji">🎮</span><span class="ic-title" id="ic-juego-title">Juego interactivo</span></div>
           <div class="ic-preview" id="ic-preview-juego"></div>
-          <div class="ic-actions"><span style="font-size:11px;color:var(--text-muted)" id="ic-juego-sub">Se elige al generar</span><button class="btn btn-outline btn-sm" style="font-size:11px;padding:4px 10px" onclick="event.stopPropagation();previewFull('juego')">Ver completo</button><button class="btn btn-outline btn-sm" style="font-size:11px;padding:4px 10px;margin-left:4px" onclick="event.stopPropagation();downloadInteractive('juego')">&#11015; Descargar</button><button class="btn btn-outline btn-sm" style="font-size:11px;padding:4px 10px;margin-left:4px" onclick="event.stopPropagation();copyInteractive('juego')">&#128203; Copiar</button></div>
+          <div class="ic-actions"><span style="font-size:11px;color:var(--text-muted)" id="ic-juego-sub">Se elige al generar</span><button class="btn btn-outline btn-sm" style="font-size:11px;padding:4px 10px" onclick="event.stopPropagation();previewFull('juego')">Ver completo</button><button class="btn btn-outline btn-sm" style="font-size:11px;padding:4px 10px;margin-left:4px" onclick="event.stopPropagation();downloadInteractive('juego')">&#11015; Descargar</button><button class="btn btn-outline btn-sm" style="font-size:11px;padding:4px 10px;margin-left:4px" onclick="event.stopPropagation();copyInteractive('juego')">&#128203; Copiar</button><button class="btn btn-outline btn-sm" id="tv-regen-juego" style="font-size:11px;padding:4px 10px;margin-left:4px" onclick="event.stopPropagation();regenerateOne('juego')">&#128260; Otro</button></div>
         </div>
       </div>
       <div id="interactive-selected-msg" class="hidden" style="padding:10px 14px;background:var(--verde-light);border-radius:var(--radius);font-size:13px;color:var(--verde-dark);margin-bottom:14px">
@@ -938,7 +938,7 @@ async function generateImgPrompt(){
   try{
     const d=await anthroFetch(apiKey,{
       model:'claude-sonnet-4-6',max_tokens:300,
-      messages:[{role:'user',content:'Generate a concise DALL-E 3 image prompt in English for this agricultural news article. The image MUST visually represent the specific subject of the article — if it is about cattle, show cattle; if about a pest or worm, show that; if about equipment, show that. Dignified realistic scene in '+detectLocation()+'. 16:9 photojournalism style. No text in image. Return ONLY the prompt.\n\nARTICLE:\n'+context}]
+      messages:[{role:'user',content:'Generate a concise DALL-E 3 image prompt in English for this agricultural news article. The image MUST visually represent the specific subject of the article - if it is about cattle, show cattle; if about a pest or worm, show that; if about equipment, show that. Dignified realistic scene in '+detectLocation()+'. 16:9 photojournalism style. No text in image. Return ONLY the prompt.\n\nARTICLE:\n'+context}]
     });
     S.imgPromptText=(d.content&&d.content[0]&&d.content[0].text)||'Photorealistic, '+detectLocation()+' farmland, Hispanic farmer, golden hour, 16:9, photojournalism style. Topic: '+title;
     $('img-prompt-text').textContent=S.imgPromptText;
@@ -1024,56 +1024,125 @@ async function generateInteractives(){
   if(!apiKey){$('interactive-load-msg').textContent='API key requerida.';return;}
   show('interactive-loading');hide('interactive-content');
   const title=$('meta-title').value||S.articleText.split('\n')[0];
-  const excerpt=S.articleText.split('\n').filter(l=>l.trim()).slice(1,6).join(' ').substring(0,800);
+  const body=S.articleText.split('\n').filter(l=>l.trim()).slice(1,10).join(' ').substring(0,1200);
+  const tipo=S.tipo||0;
 
-  // Step 1: Ask Claude for structured DATA only (not code)
-  $('interactive-load-msg').textContent='Extrayendo datos del artículo...';
-  let data = null;
+  // Format menus — Claude picks the best one per slot
+  const tablaOpts='tabla_comparativa|checklist_elegibilidad|calculadora|comparador_programas|cronograma_fechas';
+  const visualOpts='infografia_stats|calendario_agricola|paso_a_paso|glosario_terminos|mapa_pasos';
+  const juegoOpts='quiz_conocimiento|verdadero_falso|memoria_pares|ordenar_pasos|sopa_letras';
+
+  // Track used formats to avoid repeats on regenerate
+  if(!S.usedFormats)S.usedFormats={tabla:[],visual:[],juego:[]};
+
+  $('interactive-load-msg').textContent='Eligiendo los mejores formatos...';
+
+  // Step 1: Claude picks best format + extracts data for each slot
+  let plan=null;
   try{
     const d=await anthroFetch(apiKey,{
-      model:'claude-sonnet-4-6',max_tokens:1200,
-      messages:[{role:'user',content:'Extract structured data from this agricultural article for interactive widgets. Return ONLY valid JSON, no markdown, no explanation.\n\nARTICLE TITLE: '+title+'\nARTICLE: '+excerpt+'\n\nReturn this exact JSON structure:\n{\n  "tabla":{\n    "titulo":"[table title in Spanish]",\n    "headers":["Col1","Col2","Col3"],\n    "rows":[["val","val","val"],["val","val","val"],["val","val","val"],["val","val","val"],["val","val","val"]]\n  },\n  "infografia":{\n    "titulo":"[infographic title in Spanish]",\n    "stats":[\n      {"emoji":"🌱","valor":"450","sufijo":"+","etiqueta":"[label]"},\n      {"emoji":"💧","valor":"50","sufijo":"%","etiqueta":"[label]"},\n      {"emoji":"🌾","valor":"12","sufijo":"","etiqueta":"[label]"},\n      {"emoji":"📋","valor":"3","sufijo":"","etiqueta":"[label]"}\n    ],\n    "pasos":["Paso 1 description","Paso 2 description","Paso 3 description","Paso 4 description"]\n  },\n  "juego":{\n    "titulo":"[quiz title in Spanish]",\n    "subtitulo":"[quiz subtitle in Spanish]",\n    "preguntas":[\n      {"p":"[question in Spanish]?","ops":["[wrong]","[correct]","[wrong]","[wrong]"],"c":1,"exp":"[brief explanation]"},\n      {"p":"[question]?","ops":["[wrong]","[wrong]","[correct]","[wrong]"],"c":2,"exp":"[explanation]"},\n      {"p":"[question]?","ops":["[correct]","[wrong]","[wrong]","[wrong]"],"c":0,"exp":"[explanation]"},\n      {"p":"[question]?","ops":["[wrong]","[correct]","[wrong]","[wrong]"],"c":1,"exp":"[explanation]"}\n    ]\n  }\n}\n\nRules: Use REAL data from the article. For stats use real numbers. For tabla use relevant columns and data. All text in Spanish.'}]
+      model:'claude-sonnet-4-6',max_tokens:2000,
+      messages:[{role:'user',content:'You are choosing the best interactive widgets for a Spanish-language agricultural article aimed at Hispanic farmworkers in North Carolina, who may have limited literacy.\n\nARTICLE TYPE: Tipo '+tipo+' (1=news, 2=practical guide, 3=program access, 4=community story, 5=data/context)\nARTICLE TITLE: '+title+'\nARTICLE BODY: '+body+'\n\nAVOIDABLE FORMATS (already used this session - pick something different):\n- tabla slot: '+JSON.stringify(S.usedFormats.tabla)+'\n- visual slot: '+JSON.stringify(S.usedFormats.visual)+'\n- juego slot: '+JSON.stringify(S.usedFormats.juego)+'\n\nFORMAT OPTIONS:\n- Slot 1 (tabla): '+tablaOpts+'\n- Slot 2 (visual): '+visualOpts+'\n- Slot 3 (juego): '+juegoOpts+'\n\nChoose the BEST format for each slot based on article content. Then extract real data from the article to populate each widget.\n\nReturn ONLY valid JSON, no markdown:\n{\n  "formats":{"tabla":"[chosen]","visual":"[chosen]","juego":"[chosen]"},\n  "tabla":{\n    "titulo":"[title in Spanish]",\n    "formato":"[chosen format]",\n    "headers":["Col1","Col2","Col3"],\n    "rows":[["val","val","val"],["val","val","val"],["val","val","val"],["val","val","val"],["val","val","val"]],\n    "checklist":[{"item":"[requirement]","ayuda":"[brief help text]"},{"item":"...","ayuda":"..."},{"item":"...","ayuda":"..."},{"item":"...","ayuda":"..."},{"item":"...","ayuda":"..."}],\n    "calc":{"label":"[what we calculate]","campos":[{"id":"c1","label":"[field]","unit":"[unit]","default":10},{"id":"c2","label":"[field]","unit":"[unit]","default":100}],"formula":"[describe in words]","resultado_prefix":"[prefix]","resultado_unit":"[unit]"},\n    "fechas":[{"mes":"Ene","evento":"[event]"},{"mes":"Feb","evento":"[event]"},{"mes":"Mar","evento":"[event]"},{"mes":"Abr","evento":"[event]"},{"mes":"May","evento":"[event]"},{"mes":"Jun","evento":"[event]"}]\n  },\n  "visual":{\n    "titulo":"[title in Spanish]",\n    "formato":"[chosen format]",\n    "stats":[{"emoji":"🌱","valor":"450","sufijo":"+","etiqueta":"[label]"},{"emoji":"💧","valor":"50","sufijo":"%","etiqueta":"[label]"},{"emoji":"🌾","valor":"12","sufijo":"","etiqueta":"[label]"},{"emoji":"📋","valor":"3","sufijo":"","etiqueta":"[label]"}],\n    "pasos":[{"titulo":"[step title]","desc":"[1 sentence]","emoji":"🌱"},{"titulo":"...","desc":"...","emoji":"📋"},{"titulo":"...","desc":"...","emoji":"✅"},{"titulo":"...","desc":"...","emoji":"🎯"}],\n    "glosario":[{"term":"[NRCS term]","def":"[plain Spanish def]"},{"term":"...","def":"..."},{"term":"...","def":"..."},{"term":"...","def":"..."},{"term":"...","def":"..."}],\n    "calendario":[{"mes":"Ene","icon":"❄️","nota":"[what to do]"},{"mes":"Feb","icon":"🌱","nota":"[what to do]"},{"mes":"Mar","icon":"🌿","nota":"[what to do]"},{"mes":"Abr","icon":"🌾","nota":"[what to do]"},{"mes":"May","icon":"☀️","nota":"[what to do]"},{"mes":"Jun","icon":"🌻","nota":"[what to do]"},{"mes":"Jul","icon":"💧","nota":"[what to do]"},{"mes":"Ago","icon":"🔥","nota":"[what to do]"},{"mes":"Sep","icon":"🍂","nota":"[what to do]"},{"mes":"Oct","icon":"📋","nota":"[what to do]"},{"mes":"Nov","icon":"🌧️","nota":"[what to do]"},{"mes":"Dic","icon":"❄️","nota":"[what to do]"}]\n  },\n  "juego":{\n    "titulo":"[title in Spanish]",\n    "subtitulo":"[subtitle]",\n    "formato":"[chosen format]",\n    "preguntas":[{"p":"[question]?","ops":["[wrong]","[correct]","[wrong]","[wrong]"],"c":1,"exp":"[explanation]"},{"p":"[question]?","ops":["[wrong]","[wrong]","[correct]","[wrong]"],"c":2,"exp":"[explanation]"},{"p":"[question]?","ops":["[correct]","[wrong]","[wrong]","[wrong]"],"c":0,"exp":"[explanation]"},{"p":"[question]?","ops":["[wrong]","[correct]","[wrong]","[wrong]"],"c":1,"exp":"[explanation]"}],\n    "pares":[{"a":"[term]","b":"[definition]"},{"a":"...","b":"..."},{"a":"...","b":"..."},{"a":"...","b":"..."}],\n    "verdaderofalso":[{"p":"[statement]","v":true,"exp":"[explanation]"},{"p":"...","v":false,"exp":"..."},{"p":"...","v":true,"exp":"..."},{"p":"...","v":false,"exp":"..."},{"p":"...","v":true,"exp":"..."}],\n    "orden":[{"paso":1,"texto":"[first step]"},{"paso":2,"texto":"[second]"},{"paso":3,"texto":"[third]"},{"paso":4,"texto":"[fourth]"},{"paso":5,"texto":"[fifth]"}]\n  }\n}\n\nRules: Use REAL data from the article. All text in Spanish. Choose formats that make the content most useful and engaging for farmworkers.'}]
     });
     let txt=(d.content&&d.content[0]&&d.content[0].text)||'{}';
     txt=txt.replace(/```json?|```/g,'').trim();
-    data=JSON.parse(txt);
+    plan=JSON.parse(txt);
   }catch(e){
-    console.error('Data extraction error:',e);
-    data=null;
+    console.error('Plan error:',e);
+    plan=null;
   }
 
-  // Step 2: Build widgets from templates with extracted data
-  $('interactive-load-msg').textContent='Construyendo elementos interactivos...';
+  // Track used formats
+  if(plan&&plan.formats){
+    if(plan.formats.tabla)S.usedFormats.tabla.push(plan.formats.tabla);
+    if(plan.formats.visual)S.usedFormats.visual.push(plan.formats.visual);
+    if(plan.formats.juego)S.usedFormats.juego.push(plan.formats.juego);
+  }
 
-  // Pick random game type
-  const gameTypes=['quiz','memory','drag','wordsearch'];
-  const gameType=gameTypes[Math.floor(Math.random()*gameTypes.length)];
-  const gameLabels={
-    quiz:{label:'Quiz con temporizador',emoji:'⏱️',sub:'4 preguntas con temporizador'},
-    memory:{label:'Juego de memoria',emoji:'🃏',sub:'Empareja terminos del articulo'},
-    drag:{label:'Arrastra y ordena',emoji:'↕️',sub:'Ordena los pasos del proceso'},
-    wordsearch:{label:'Sopa de letras',emoji:'🔍',sub:'Encuentra los terminos clave'}
-  };
-  const picked=gameLabels[gameType];
-  S.selectedGameLabel=picked.label;
-  const juegoTitle=document.querySelector('#ic-juego-title');
-  const juegoEmoji=document.querySelector('#ic-juego-emoji');
-  const juegoSub=document.querySelector('#ic-juego-sub');
-  if(juegoTitle)juegoTitle.textContent=picked.label;
-  if(juegoEmoji)juegoEmoji.textContent=picked.emoji;
-  if(juegoSub)juegoSub.textContent=picked.sub;
+  $('interactive-load-msg').textContent='Construyendo elementos interactivos...';
 
   const COLOR='#1e7c73';
   const COLORL='#e8f5f4';
   const COLORA='#93bc52';
 
-  // ── TABLA ──────────────────────────────────────────
-  const tData=data&&data.tabla;
-  const tTitle=tData&&tData.titulo||title;
-  const tHeaders=tData&&tData.headers||['Elemento','Descripcion','Valor'];
-  const tRows=tData&&tData.rows||[['--','--','--']];
+  // ── SLOT 1: TABLA ──────────────────────────────────────────────────────────
+  const tPlan=plan&&plan.tabla;
+  const tFmt=(plan&&plan.formats&&plan.formats.tabla)||'tabla_comparativa';
+  const tTitle=tPlan&&tPlan.titulo||title;
 
-  S.interactiveHTMLs.tabla=`<div style="font-family:DM Sans,sans-serif;padding:16px">
+  // Update card header label
+  const tablaLabels={tabla_comparativa:{icon:'📊',label:'Tabla comparativa'},checklist_elegibilidad:{icon:'✅',label:'Checklist de elegibilidad'},calculadora:{icon:'🧮',label:'Calculadora'},comparador_programas:{icon:'⚖️',label:'Comparador de programas'},cronograma_fechas:{icon:'📅',label:'Cronograma de fechas'}};
+  const tLabel=tablaLabels[tFmt]||tablaLabels.tabla_comparativa;
+  const tHeader=$('ic-tabla');
+  if(tHeader){tHeader.querySelector('.ic-title').textContent=tLabel.label;tHeader.querySelector('span').textContent=tLabel.icon;}
+
+  if(tFmt==='checklist_elegibilidad'&&tPlan&&tPlan.checklist){
+    const items=tPlan.checklist;
+    S.interactiveHTMLs.tabla=`<div style="font-family:DM Sans,sans-serif;padding:16px">
+  <h3 style="color:${COLOR};margin-bottom:6px;font-size:15px">${tTitle}</h3>
+  <p style="font-size:12px;color:#666;margin-bottom:14px">Marca cada requisito que cumples</p>
+  <div id="tv-checks">${items.map((it,i)=>`<label style="display:flex;align-items:flex-start;gap:10px;padding:10px 12px;border-radius:8px;margin-bottom:6px;background:#fff;border:1.5px solid #eee;cursor:pointer" id="tv-lbl-${i}">
+    <input type="checkbox" onchange="tvCheck()" style="margin-top:2px;width:16px;height:16px;accent-color:${COLOR};flex-shrink:0"/>
+    <div><div style="font-size:13px;font-weight:600;color:#222">${it.item}</div><div style="font-size:12px;color:#666;margin-top:2px">${it.ayuda}</div></div>
+  </label>`).join('')}</div>
+  <div id="tv-result" style="margin-top:14px;padding:12px 14px;border-radius:8px;background:${COLORL};font-size:13px;color:${COLOR};font-weight:600;display:none"></div>
+  <script>
+  function tvCheck(){
+    var boxes=document.querySelectorAll('#tv-checks input[type=checkbox]');
+    var total=boxes.length,checked=0;
+    boxes.forEach(function(b,i){
+      checked+=b.checked?1:0;
+      document.getElementById('tv-lbl-'+i).style.background=b.checked?'${COLORL}':'#fff';
+      document.getElementById('tv-lbl-'+i).style.borderColor=b.checked?'${COLOR}':'#eee';
+    });
+    var r=document.getElementById('tv-result');
+    r.style.display='block';
+    if(checked===total){r.textContent='Probablemente calificas. Contacta tu oficina NRCS local.';r.style.background='${COLORL}';r.style.color='${COLOR}';}
+    else if(checked>=Math.ceil(total/2)){r.textContent='Cumples '+checked+' de '+total+' requisitos. Habla con un especialista NRCS.';r.style.background='#FFF9E6';r.style.color='#92600A';}
+    else{r.textContent='Cumples '+checked+' de '+total+' requisitos. Puede que necesites preparacion adicional.';r.style.background='#FEF2F2';r.style.color='#991B1B';}
+  }
+  <\/script></div>`;
+
+  } else if(tFmt==='calculadora'&&tPlan&&tPlan.calc){
+    const calc=tPlan.calc;
+    const campos=calc.campos||[];
+    S.interactiveHTMLs.tabla=`<div style="font-family:DM Sans,sans-serif;padding:16px">
+  <h3 style="color:${COLOR};margin-bottom:6px;font-size:15px">${tTitle}</h3>
+  <p style="font-size:12px;color:#666;margin-bottom:14px">${calc.label}</p>
+  ${campos.map(c=>`<div style="margin-bottom:10px"><label style="font-size:12px;font-weight:600;color:#444;display:block;margin-bottom:4px">${c.label} (${c.unit})</label><input id="tv-${c.id}" type="number" value="${c.default}" oninput="tvCalc()" style="width:100%;padding:8px 12px;border:1.5px solid #ddd;border-radius:8px;font-size:14px;box-sizing:border-box;outline:none"/></div>`).join('')}
+  <button onclick="tvCalc()" style="background:${COLOR};color:#fff;border:none;padding:10px 20px;border-radius:8px;font-size:14px;font-weight:600;cursor:pointer;width:100%;margin-top:4px;font-family:DM Sans,sans-serif">Calcular</button>
+  <div id="tv-calc-result" style="margin-top:14px;padding:14px;border-radius:8px;background:${COLORL};display:none">
+    <div style="font-size:12px;color:#555;margin-bottom:4px">${calc.resultado_prefix}</div>
+    <div style="font-size:28px;font-weight:700;color:${COLOR}" id="tv-calc-num">--</div>
+    <div style="font-size:12px;color:#555">${calc.resultado_unit}</div>
+  </div>
+  <script>
+  function tvCalc(){
+    var vals={};
+    ${campos.map(c=>`vals['${c.id}']=parseFloat(document.getElementById('tv-${c.id}').value)||0;`).join('')}
+    var result=0;
+    try{ result=Math.round(${campos.length>=2?`vals['${campos[0].id}']*vals['${campos[1].id}']`:`vals['${campos[0]&&campos[0].id||'c1'}']`}); }catch(e){result=0;}
+    document.getElementById('tv-calc-num').textContent=result.toLocaleString();
+    document.getElementById('tv-calc-result').style.display='block';
+  }
+  <\/script></div>`;
+
+  } else if(tFmt==='cronograma_fechas'&&tPlan&&tPlan.fechas){
+    const fechas=tPlan.fechas;
+    S.interactiveHTMLs.tabla=`<div style="font-family:DM Sans,sans-serif;padding:16px">
+  <h3 style="color:${COLOR};margin-bottom:14px;font-size:15px">${tTitle}</h3>
+  <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px">
+  ${fechas.map(f=>`<div style="background:${COLORL};border-radius:8px;padding:10px;text-align:center">
+    <div style="font-size:11px;font-weight:700;color:${COLOR};text-transform:uppercase;letter-spacing:.05em">${f.mes}</div>
+    <div style="font-size:12px;color:#333;margin-top:4px">${f.evento}</div>
+  </div>`).join('')}
+  </div></div>`;
+
+  } else {
+    // Default: tabla comparativa
+    const tHeaders=tPlan&&tPlan.headers||['Elemento','Descripcion','Valor'];
+    const tRows=tPlan&&tPlan.rows||[['--','--','--']];
+    S.interactiveHTMLs.tabla=`<div style="font-family:DM Sans,sans-serif;padding:16px">
   <h3 style="color:${COLOR};margin-bottom:12px;font-size:15px">${tTitle}</h3>
   <input id="tv-search" type="text" placeholder="Buscar..." onkeyup="tvFilter()" style="width:100%;padding:8px 12px;border:1.5px solid #ddd;border-radius:8px;margin-bottom:12px;font-size:13px;box-sizing:border-box;outline:none"/>
   <div style="overflow-x:auto">
@@ -1082,31 +1151,66 @@ async function generateInteractives(){
   <tbody id="tv-body">${tRows.map((r,ri)=>`<tr style="background:${ri%2===0?'#fff':COLORL}">${r.map(c=>`<td style="padding:9px 12px;border-bottom:1px solid #eee">${c}</td>`).join('')}</tr>`).join('')}</tbody>
   </table></div>
   <script>
-  var _tvData=${JSON.stringify(tRows)};
   var _tvDir=[];
-  function tvSort(col){
-    _tvDir[col]=!_tvDir[col];
-    var d=[...document.querySelectorAll('#tv-body tr')];
-    d.sort(function(a,b){var av=a.cells[col].textContent,bv=b.cells[col].textContent;var n=parseFloat(av)-parseFloat(bv);return isNaN(n)?(_tvDir[col]?av.localeCompare(bv):bv.localeCompare(av)):(_tvDir[col]?n:-n);});
-    document.querySelectorAll('[id^=tv-arr-]').forEach(function(e){e.textContent='';});
-    document.getElementById('tv-arr-'+col).textContent=_tvDir[col]?' ↑':' ↓';
-    var tb=document.getElementById('tv-body');tb.innerHTML='';
-    d.forEach(function(r,i){r.style.background=i%2===0?'#fff':'${COLORL}';tb.appendChild(r);});
+  function tvSort(col){_tvDir[col]=!_tvDir[col];var d=[...document.querySelectorAll('#tv-body tr')];d.sort(function(a,b){var av=a.cells[col].textContent,bv=b.cells[col].textContent;var n=parseFloat(av)-parseFloat(bv);return isNaN(n)?(_tvDir[col]?av.localeCompare(bv):bv.localeCompare(av)):(_tvDir[col]?n:-n);});document.querySelectorAll('[id^=tv-arr-]').forEach(function(e){e.textContent='';});document.getElementById('tv-arr-'+col).textContent=_tvDir[col]?' ↑':' ↓';var tb=document.getElementById('tv-body');tb.innerHTML='';d.forEach(function(r,i){r.style.background=i%2===0?'#fff':'${COLORL}';tb.appendChild(r);});}
+  function tvFilter(){var q=document.getElementById('tv-search').value.toLowerCase();document.querySelectorAll('#tv-body tr').forEach(function(r){r.style.display=[...r.cells].some(function(c){return c.textContent.toLowerCase().includes(q);})?'':'none';});}
+  <\/script></div>`;
   }
-  function tvFilter(){
-    var q=document.getElementById('tv-search').value.toLowerCase();
-    document.querySelectorAll('#tv-body tr').forEach(function(r){r.style.display=[...r.cells].some(function(c){return c.textContent.toLowerCase().includes(q);})?'':'none';});
-  }
+
+  // ── SLOT 2: VISUAL ─────────────────────────────────────────────────────────
+  const vPlan=plan&&plan.visual;
+  const vFmt=(plan&&plan.formats&&plan.formats.visual)||'infografia_stats';
+  const vTitle=vPlan&&vPlan.titulo||title;
+
+  const visualLabels={infografia_stats:{icon:'📊',label:'Infografia animada'},calendario_agricola:{icon:'📅',label:'Calendario agricola'},paso_a_paso:{icon:'👣',label:'Guia paso a paso'},glosario_terminos:{icon:'📖',label:'Glosario interactivo'},mapa_pasos:{icon:'🗺️',label:'Mapa de pasos'}};
+  const vLabel=visualLabels[vFmt]||visualLabels.infografia_stats;
+  const vHeader=$('ic-infografia');
+  if(vHeader){vHeader.querySelector('.ic-title').textContent=vLabel.label;vHeader.querySelector('span').textContent=vLabel.icon;}
+
+  if(vFmt==='calendario_agricola'&&vPlan&&vPlan.calendario){
+    const cal=vPlan.calendario;
+    const now=new Date().getMonth();
+    S.interactiveHTMLs.infografia=`<div style="font-family:DM Sans,sans-serif;padding:16px">
+  <h3 style="color:${COLOR};margin-bottom:14px;font-size:15px;text-align:center">${vTitle}</h3>
+  <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:6px">
+  ${cal.map((m,i)=>`<div style="background:${i===now?COLOR:COLORL};border-radius:8px;padding:8px;text-align:center;border:${i===now?'2px solid '+COLOR:'1.5px solid #ddd'}">
+    <div style="font-size:16px">${m.icon}</div>
+    <div style="font-size:10px;font-weight:700;color:${i===now?'#fff':COLOR};text-transform:uppercase">${m.mes}</div>
+    <div style="font-size:10px;color:${i===now?'#e8f5f4':'#555'};margin-top:3px;line-height:1.3">${m.nota}</div>
+  </div>`).join('')}
+  </div></div>`;
+
+  } else if(vFmt==='glosario_terminos'&&vPlan&&vPlan.glosario){
+    const glos=vPlan.glosario;
+    S.interactiveHTMLs.infografia=`<div style="font-family:DM Sans,sans-serif;padding:16px">
+  <h3 style="color:${COLOR};margin-bottom:6px;font-size:15px">${vTitle}</h3>
+  <p style="font-size:12px;color:#666;margin-bottom:12px">Toca un termino para ver su definicion</p>
+  ${glos.map((g,i)=>`<div style="margin-bottom:6px">
+    <button onclick="tvGlos(${i})" style="width:100%;text-align:left;padding:10px 14px;background:#fff;border:1.5px solid #ddd;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;color:${COLOR};font-family:DM Sans,sans-serif">${g.term}</button>
+    <div id="tv-glos-${i}" style="display:none;padding:10px 14px;background:${COLORL};border-radius:0 0 8px 8px;font-size:13px;color:#333;border:1.5px solid ${COLOR};border-top:none">${g.def}</div>
+  </div>`).join('')}
+  <script>
+  function tvGlos(i){var el=document.getElementById('tv-glos-'+i);var open=el.style.display==='block';document.querySelectorAll('[id^=tv-glos-]').forEach(function(e){e.style.display='none';});if(!open)el.style.display='block';}
   <\/script></div>`;
 
-  // ── INFOGRAFIA ──────────────────────────────────────────
-  const iData=data&&data.infografia;
-  const iTitle=iData&&iData.titulo||title;
-  const iStats=iData&&iData.stats||[{emoji:'🌱',valor:'450',sufijo:'+',etiqueta:'Productores'},{emoji:'💧',valor:'50',sufijo:'%',etiqueta:'Ahorro de agua'},{emoji:'🌾',valor:'12',sufijo:'',etiqueta:'Practicas'},{emoji:'📋',valor:'3',sufijo:'',etiqueta:'Programas'}];
-  const iPasos=iData&&iData.pasos||['Contactar oficina NRCS','Completar solicitud','Evaluacion tecnica','Recibir asistencia'];
+  } else if(vFmt==='paso_a_paso'&&vPlan&&vPlan.pasos){
+    const pasos=vPlan.pasos;
+    S.interactiveHTMLs.infografia=`<div style="font-family:DM Sans,sans-serif;padding:16px">
+  <h3 style="color:${COLOR};margin-bottom:16px;font-size:15px">${vTitle}</h3>
+  ${pasos.map((p,i)=>`<div id="tv-paso-${i}" style="display:flex;gap:12px;margin-bottom:12px;padding:12px;border-radius:10px;background:${i===0?COLORL:'#fff'};border:1.5px solid ${i===0?COLOR:'#eee'};cursor:pointer" onclick="tvPaso(${i})">
+    <div style="min-width:32px;height:32px;background:${COLOR};color:#fff;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:700;flex-shrink:0">${p.emoji||i+1}</div>
+    <div><div style="font-size:13px;font-weight:700;color:#222">${p.titulo}</div><div id="tv-pd-${i}" style="font-size:12px;color:#555;margin-top:4px;display:${i===0?'block':'none'}">${p.desc}</div></div>
+  </div>`).join('')}
+  <script>
+  function tvPaso(i){document.querySelectorAll('[id^=tv-paso-]').forEach(function(e,j){e.style.background=j===i?'${COLORL}':'#fff';e.style.borderColor=j===i?'${COLOR}':'#eee';document.getElementById('tv-pd-'+j).style.display=j===i?'block':'none';});}
+  <\/script></div>`;
 
-  S.interactiveHTMLs.infografia=`<div style="font-family:DM Sans,sans-serif;padding:16px">
-  <h3 style="color:${COLOR};margin-bottom:16px;font-size:15px;text-align:center">${iTitle}</h3>
+  } else {
+    // Default: infografia stats
+    const iStats=vPlan&&vPlan.stats||[{emoji:'🌱',valor:'450',sufijo:'+',etiqueta:'Productores'},{emoji:'💧',valor:'50',sufijo:'%',etiqueta:'Ahorro de agua'},{emoji:'🌾',valor:'12',sufijo:'',etiqueta:'Practicas'},{emoji:'📋',valor:'3',sufijo:'',etiqueta:'Programas'}];
+    const iPasos=vPlan&&vPlan.pasos||[{titulo:'Contactar NRCS',desc:'Llama a tu oficina local',emoji:'📞'},{titulo:'Solicitud',desc:'Completa el formulario',emoji:'📋'},{titulo:'Evaluacion',desc:'Visita tecnica',emoji:'🔍'},{titulo:'Asistencia',desc:'Recibe apoyo',emoji:'✅'}];
+    S.interactiveHTMLs.infografia=`<div style="font-family:DM Sans,sans-serif;padding:16px">
+  <h3 style="color:${COLOR};margin-bottom:16px;font-size:15px;text-align:center">${vTitle}</h3>
   <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:20px">
   ${iStats.map(s=>`<div class="tv-stat" data-target="${s.valor}" data-suf="${s.sufijo}" style="background:${COLORL};border-radius:12px;padding:16px;text-align:center">
     <div style="font-size:28px;margin-bottom:6px">${s.emoji}</div>
@@ -1114,41 +1218,110 @@ async function generateInteractives(){
     <div style="font-size:12px;color:#555;margin-top:4px">${s.etiqueta}</div>
   </div>`).join('')}
   </div>
-  <div style="margin-top:8px">
-    <p style="font-size:12px;font-weight:600;color:${COLOR};text-transform:uppercase;letter-spacing:.05em;margin-bottom:10px">Pasos del proceso</p>
-    ${iPasos.map((p,i)=>`<div style="display:flex;align-items:flex-start;gap:10px;margin-bottom:10px">
-      <div style="min-width:26px;height:26px;background:${COLOR};color:#fff;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;flex-shrink:0">${i+1}</div>
-      <div style="font-size:13px;color:#333;padding-top:4px">${p}</div>
-    </div>`).join('')}
+  <div>${iPasos.map((p,i)=>`<div style="display:flex;align-items:flex-start;gap:10px;margin-bottom:10px"><div style="min-width:26px;height:26px;background:${COLOR};color:#fff;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;flex-shrink:0">${i+1}</div><div style="font-size:13px;color:#333;padding-top:4px">${p.titulo||p}</div></div>`).join('')}</div>
+  <script>(function(){var stats=document.querySelectorAll('.tv-stat');stats.forEach(function(s){var target=parseInt(s.dataset.target)||0;var suf=s.dataset.suf||'';var el=s.querySelector('.tv-num');var current=0;var step=Math.max(1,Math.ceil(target/40));var timer=setInterval(function(){current=Math.min(current+step,target);el.textContent=current.toLocaleString()+suf;if(current>=target)clearInterval(timer);},40);});})();<\/script></div>`;
+  }
+
+  // ── SLOT 3: JUEGO ──────────────────────────────────────────────────────────
+  const gPlan=plan&&plan.juego;
+  const gFmt=(plan&&plan.formats&&plan.formats.juego)||'quiz_conocimiento';
+  const gTitle=gPlan&&gPlan.titulo||'Quiz: '+title.substring(0,40);
+  const gSub=gPlan&&gPlan.subtitulo||'Pon a prueba tus conocimientos';
+
+  const juegoLabels={quiz_conocimiento:{icon:'🧠',label:'Quiz de conocimiento',sub:'Responde las preguntas'},verdadero_falso:{icon:'✅',label:'Verdadero o Falso',sub:'Decide si es verdad'},memoria_pares:{icon:'🃏',label:'Memoria: empareja',sub:'Encuentra los pares'},ordenar_pasos:{icon:'↕️',label:'Ordena los pasos',sub:'Arrastra en el orden correcto'},sopa_letras:{icon:'🔍',label:'Quiz rapido',sub:'Verdadero o falso rapido'}};
+  const gLabel=juegoLabels[gFmt]||juegoLabels.quiz_conocimiento;
+  S.selectedGameLabel=gLabel.label;
+  const juegoTitle=document.querySelector('#ic-juego-title');
+  const juegoEmoji=document.querySelector('#ic-juego-emoji');
+  const juegoSub=document.querySelector('#ic-juego-sub');
+  if(juegoTitle)juegoTitle.textContent=gLabel.label;
+  if(juegoEmoji)juegoEmoji.textContent=gLabel.icon;
+  if(juegoSub)juegoSub.textContent=gLabel.sub;
+
+  if(gFmt==='verdadero_falso'&&gPlan&&gPlan.verdaderofalso){
+    const vf=gPlan.verdaderofalso;
+    S.interactiveHTMLs.juego=`<div style="font-family:DM Sans,sans-serif;padding:16px;max-width:560px;margin:0 auto">
+  <div id="tv-vf-intro" style="text-align:center;padding:20px 10px">
+    <div style="font-size:36px;margin-bottom:12px">✅</div>
+    <h3 style="color:${COLOR};font-size:18px;margin-bottom:8px">${gTitle}</h3>
+    <p style="color:#666;font-size:14px;margin-bottom:20px">${gSub}</p>
+    <button onclick="tvVFStart()" style="background:${COLOR};color:#fff;border:none;padding:12px 28px;border-radius:8px;font-size:15px;font-weight:600;cursor:pointer;font-family:DM Sans,sans-serif">Comenzar</button>
+  </div>
+  <div id="tv-vf-game" style="display:none">
+    <div style="display:flex;justify-content:space-between;margin-bottom:12px"><span id="tv-vf-cnt" style="font-size:13px;color:#666"></span><span id="tv-vf-sc" style="font-size:13px;font-weight:600;color:${COLOR}">0 pts</span></div>
+    <p id="tv-vf-q" style="font-size:16px;font-weight:600;color:#222;margin-bottom:20px;min-height:60px"></p>
+    <div style="display:flex;gap:12px">
+      <button onclick="tvVFAnswer(true)" style="flex:1;padding:14px;background:#E8F5E9;border:2px solid #4CAF50;border-radius:10px;font-size:16px;font-weight:700;cursor:pointer;color:#2E7D32;font-family:DM Sans,sans-serif">Verdadero</button>
+      <button onclick="tvVFAnswer(false)" style="flex:1;padding:14px;background:#FEECEC;border:2px solid #EF5350;border-radius:10px;font-size:16px;font-weight:700;cursor:pointer;color:#C62828;font-family:DM Sans,sans-serif">Falso</button>
+    </div>
+    <p id="tv-vf-exp" style="margin-top:12px;font-size:13px;color:#555;min-height:20px;font-style:italic"></p>
+    <button id="tv-vf-next" onclick="tvVFNext()" style="display:none;margin-top:12px;background:${COLOR};color:#fff;border:none;padding:10px 22px;border-radius:8px;font-size:14px;font-weight:600;cursor:pointer;font-family:DM Sans,sans-serif">Siguiente</button>
+  </div>
+  <div id="tv-vf-end" style="display:none;text-align:center;padding:20px 10px">
+    <div id="tv-vf-emoji" style="font-size:48px;margin-bottom:12px"></div>
+    <h3 id="tv-vf-result" style="color:${COLOR};font-size:20px;margin-bottom:8px"></h3>
+    <button onclick="tvVFStart()" style="background:${COLOR};color:#fff;border:none;padding:10px 22px;border-radius:8px;font-size:14px;font-weight:600;cursor:pointer;font-family:DM Sans,sans-serif">Intentar de nuevo</button>
   </div>
   <script>
-  (function(){
-    var stats=document.querySelectorAll('.tv-stat');
-    stats.forEach(function(s){
-      var target=parseInt(s.dataset.target)||0;
-      var suf=s.dataset.suf||'';
-      var el=s.querySelector('.tv-num');
-      var current=0;
-      var step=Math.max(1,Math.ceil(target/40));
-      var timer=setInterval(function(){
-        current=Math.min(current+step,target);
-        el.textContent=current.toLocaleString()+suf;
-        if(current>=target)clearInterval(timer);
-      },40);
-    });
-  })();
+  var _vf=${JSON.stringify(vf)};var _vfi=0,_vfsc=0,_vfan=false;
+  function tvVFStart(){_vfi=0;_vfsc=0;document.getElementById('tv-vf-intro').style.display='none';document.getElementById('tv-vf-end').style.display='none';document.getElementById('tv-vf-game').style.display='block';tvVFShow();}
+  function tvVFShow(){var q=_vf[_vfi];_vfan=false;document.getElementById('tv-vf-cnt').textContent='Pregunta '+(_vfi+1)+' de '+_vf.length;document.getElementById('tv-vf-sc').textContent=_vfsc+' pts';document.getElementById('tv-vf-q').textContent=q.p;document.getElementById('tv-vf-exp').textContent='';document.getElementById('tv-vf-next').style.display='none';}
+  function tvVFAnswer(ans){if(_vfan)return;_vfan=true;var q=_vf[_vfi];var ok=ans===q.v;if(ok){_vfsc+=100;document.getElementById('tv-vf-sc').textContent=_vfsc+' pts';}document.getElementById('tv-vf-exp').textContent=(ok?'Correcto. ':'Incorrecto. ')+q.exp;document.getElementById('tv-vf-next').style.display='inline-block';}
+  function tvVFNext(){_vfi++;if(_vfi>=_vf.length){document.getElementById('tv-vf-game').style.display='none';document.getElementById('tv-vf-end').style.display='block';var pct=Math.round((_vfsc/(_vf.length*100))*100);document.getElementById('tv-vf-emoji').textContent=pct>=80?'🏆':pct>=50?'👍':'🌱';document.getElementById('tv-vf-result').textContent=_vfsc+' / '+(_vf.length*100)+' puntos';}else{tvVFShow();}}
   <\/script></div>`;
 
-  // ── GAME ──────────────────────────────────────────
-  const gData=data&&data.juego;
-  const gTitle=gData&&gData.titulo||'Quiz: '+title.substring(0,40);
-  const gSub=gData&&gData.subtitulo||'Pon a prueba tus conocimientos';
-  const gQs=gData&&gData.preguntas||[
-    {p:'Cual es el objetivo principal del NRCS?',ops:['Vender fertilizantes','Conservar recursos naturales','Regular precios agricolas','Exportar productos'],c:1,exp:'El NRCS ayuda a conservar los recursos naturales en tierras agricolas.'},
-    {p:'Que significa NRCS en espanol?',ops:['Servicio Nacional de Control Rural','Servicio de Conservacion de Recursos Naturales','Servicio Nacional de Cosechas Rurales','Ninguna de las anteriores'],c:1,exp:'NRCS = Natural Resources Conservation Service.'}
-  ];
+  } else if(gFmt==='memoria_pares'&&gPlan&&gPlan.pares){
+    const pares=gPlan.pares;
+    // Build card deck: terms + definitions shuffled
+    S.interactiveHTMLs.juego=`<div style="font-family:DM Sans,sans-serif;padding:16px;max-width:560px;margin:0 auto">
+  <h3 style="color:${COLOR};font-size:16px;margin-bottom:6px">${gTitle}</h3>
+  <p style="font-size:12px;color:#666;margin-bottom:14px">Toca una tarjeta de terminos y luego su definicion</p>
+  <div style="margin-bottom:10px"><p style="font-size:11px;font-weight:700;color:${COLOR};text-transform:uppercase;letter-spacing:.05em;margin-bottom:6px">Terminos</p>
+  <div style="display:flex;flex-direction:column;gap:6px" id="tv-m-terms">${pares.map((p,i)=>`<button onclick="tvMSel('t',${i},this)" id="tv-mt-${i}" style="text-align:left;padding:10px 14px;background:#fff;border:1.5px solid #ddd;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;color:#222;font-family:DM Sans,sans-serif">${p.a}</button>`).join('')}</div></div>
+  <div><p style="font-size:11px;font-weight:700;color:${COLOR};text-transform:uppercase;letter-spacing:.05em;margin-bottom:6px">Definiciones</p>
+  <div style="display:flex;flex-direction:column;gap:6px" id="tv-m-defs">${pares.map((p,i)=>`<button onclick="tvMSel('d',${i},this)" id="tv-md-${i}" style="text-align:left;padding:10px 14px;background:#fff;border:1.5px solid #ddd;border-radius:8px;font-size:13px;cursor:pointer;color:#555;font-family:DM Sans,sans-serif">${p.b}</button>`).join('')}</div></div>
+  <div id="tv-m-msg" style="margin-top:12px;font-size:13px;font-weight:600;color:${COLOR};min-height:20px"></div>
+  <script>
+  var _mvSel={t:null,d:null},_mvMatch=0,_mvTotal=${pares.length};
+  function tvMSel(type,idx,btn){
+    if(btn.disabled)return;
+    if(_mvSel[type]!==null)document.getElementById('tv-m'+(type==='t'?'t':'d')+'-'+_mvSel[type]).style.border='1.5px solid #ddd';
+    _mvSel[type]=idx;btn.style.border='2px solid ${COLOR}';
+    if(_mvSel.t!==null&&_mvSel.d!==null){
+      var ok=_mvSel.t===_mvSel.d;
+      var te=document.getElementById('tv-mt-'+_mvSel.t),de=document.getElementById('tv-md-'+_mvSel.d);
+      if(ok){te.style.background='${COLORL}';de.style.background='${COLORL}';te.disabled=true;de.disabled=true;_mvMatch++;document.getElementById('tv-m-msg').textContent=_mvMatch===_mvTotal?'Perfecto! Emparejaste todo correctamente.':'Correcto! Sigue.';}
+      else{te.style.border='1.5px solid #EF5350';de.style.border='1.5px solid #EF5350';setTimeout(function(){if(!te.disabled)te.style.border='1.5px solid #ddd';if(!de.disabled)de.style.border='1.5px solid #ddd';},600);document.getElementById('tv-m-msg').textContent='Intenta de nuevo.';}
+      _mvSel={t:null,d:null};
+    }
+  }
+  <\/script></div>`;
 
-  S.interactiveHTMLs.juego=`<div style="font-family:DM Sans,sans-serif;padding:16px;max-width:560px;margin:0 auto" id="tv-quiz-root">
+  } else if(gFmt==='ordenar_pasos'&&gPlan&&gPlan.orden){
+    const orden=gPlan.orden;
+    const shuffled=[...orden].sort(()=>Math.random()-.5);
+    S.interactiveHTMLs.juego=`<div style="font-family:DM Sans,sans-serif;padding:16px;max-width:560px;margin:0 auto">
+  <h3 style="color:${COLOR};font-size:16px;margin-bottom:6px">${gTitle}</h3>
+  <p style="font-size:12px;color:#666;margin-bottom:14px">Arrastra los pasos en el orden correcto</p>
+  <div id="tv-ord-list" style="display:flex;flex-direction:column;gap:6px">
+  ${shuffled.map((s,i)=>`<div draggable="true" data-correct="${s.paso}" ondragstart="tvOrdDrag(event,${i})" ondragover="tvOrdOver(event)" ondrop="tvOrdDrop(event,${i})" style="display:flex;align-items:center;gap:10px;padding:12px 14px;background:#fff;border:1.5px solid #ddd;border-radius:8px;cursor:grab;font-size:13px" id="tv-ord-${i}">
+    <span style="font-size:16px">☰</span><span>${s.texto}</span>
+  </div>`).join('')}
+  </div>
+  <button onclick="tvOrdCheck()" style="margin-top:14px;background:${COLOR};color:#fff;border:none;padding:10px 20px;border-radius:8px;font-size:14px;font-weight:600;cursor:pointer;font-family:DM Sans,sans-serif">Verificar orden</button>
+  <div id="tv-ord-msg" style="margin-top:10px;font-size:13px;font-weight:600;min-height:20px"></div>
+  <script>
+  var _ordDrag=null;
+  function tvOrdDrag(e,i){_ordDrag=i;e.dataTransfer.effectAllowed='move';}
+  function tvOrdOver(e){e.preventDefault();e.dataTransfer.dropEffect='move';}
+  function tvOrdDrop(e,i){e.preventDefault();if(_ordDrag===null||_ordDrag===i)return;var list=document.getElementById('tv-ord-list');var items=[...list.children];var from=items[_ordDrag],to=items[i];if(_ordDrag<i)list.insertBefore(from,to.nextSibling);else list.insertBefore(from,to);_ordDrag=null;}
+  function tvOrdCheck(){var items=[...document.getElementById('tv-ord-list').children];var ok=true;items.forEach(function(el,i){var correct=parseInt(el.dataset.correct)===i+1;el.style.background=correct?'${COLORL}':'#FEECEC';el.style.borderColor=correct?'${COLOR}':'#EF5350';if(!correct)ok=false;});document.getElementById('tv-ord-msg').textContent=ok?'Perfecto! El orden es correcto.':'Algunos pasos no estan en el orden correcto. Intenta de nuevo.';}
+  <\/script></div>`;
+
+  } else {
+    // Default: quiz
+    const gQs=gPlan&&gPlan.preguntas||[{p:'Cual es el objetivo del NRCS?',ops:['Vender fertilizantes','Conservar recursos naturales','Regular precios','Exportar productos'],c:1,exp:'El NRCS conserva los recursos naturales en tierras agricolas.'},{p:'Que significa EQIP?',ops:['Programa de calidad ambiental','Programa de exportacion','Inspeccion de equipos','Ninguna'],c:0,exp:'EQIP = Environmental Quality Incentives Program.'}];
+    S.interactiveHTMLs.juego=`<div style="font-family:DM Sans,sans-serif;padding:16px;max-width:560px;margin:0 auto" id="tv-quiz-root">
   <div id="tv-q-intro" style="text-align:center;padding:20px 10px">
     <div style="font-size:36px;margin-bottom:12px">🌱</div>
     <h3 style="color:${COLOR};font-size:18px;margin-bottom:8px">${gTitle}</h3>
@@ -1156,13 +1329,8 @@ async function generateInteractives(){
     <button onclick="tvQStart()" style="background:${COLOR};color:#fff;border:none;padding:12px 28px;border-radius:8px;font-size:15px;font-weight:600;cursor:pointer;font-family:DM Sans,sans-serif">Comenzar Quiz</button>
   </div>
   <div id="tv-q-game" style="display:none">
-    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px">
-      <span id="tv-q-counter" style="font-size:13px;color:#666"></span>
-      <span id="tv-q-score" style="font-size:13px;font-weight:600;color:${COLOR}">0 pts</span>
-    </div>
-    <div id="tv-q-bar-wrap" style="height:6px;background:#eee;border-radius:3px;margin-bottom:18px;overflow:hidden">
-      <div id="tv-q-bar" style="height:100%;background:${COLORA};border-radius:3px;transition:width .4s;width:0%"></div>
-    </div>
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px"><span id="tv-q-counter" style="font-size:13px;color:#666"></span><span id="tv-q-score" style="font-size:13px;font-weight:600;color:${COLOR}">0 pts</span></div>
+    <div id="tv-q-bar-wrap" style="height:6px;background:#eee;border-radius:3px;margin-bottom:18px;overflow:hidden"><div id="tv-q-bar" style="height:100%;background:${COLORA};border-radius:3px;transition:width .4s;width:0%"></div></div>
     <p id="tv-q-text" style="font-size:16px;font-weight:600;color:#222;margin-bottom:16px;min-height:48px"></p>
     <div id="tv-q-opts" style="display:flex;flex-direction:column;gap:8px"></div>
     <p id="tv-q-exp" style="margin-top:12px;font-size:13px;color:#555;min-height:20px;font-style:italic"></p>
@@ -1175,66 +1343,13 @@ async function generateInteractives(){
     <button onclick="tvQStart()" style="background:${COLOR};color:#fff;border:none;padding:10px 22px;border-radius:8px;font-size:14px;font-weight:600;cursor:pointer;font-family:DM Sans,sans-serif">Intentar de nuevo</button>
   </div>
   <script>
-  var _tvQs=${JSON.stringify(gQs)};
-  var _tvQi=0,_tvQsc=0,_tvQan=false;
-  function tvQStart(){
-    _tvQi=0;_tvQsc=0;_tvQan=false;
-    document.getElementById('tv-q-intro').style.display='none';
-    document.getElementById('tv-q-end').style.display='none';
-    document.getElementById('tv-q-game').style.display='block';
-    tvQShow();
-  }
-  function tvQShow(){
-    var q=_tvQs[_tvQi];
-    _tvQan=false;
-    document.getElementById('tv-q-counter').textContent='Pregunta '+(_tvQi+1)+' de '+_tvQs.length;
-    document.getElementById('tv-q-bar').style.width=((_tvQi/_tvQs.length)*100)+'%';
-    document.getElementById('tv-q-score').textContent=_tvQsc+' pts';
-    document.getElementById('tv-q-text').textContent=q.p;
-    document.getElementById('tv-q-exp').textContent='';
-    document.getElementById('tv-q-next').style.display='none';
-    var opts=document.getElementById('tv-q-opts');
-    opts.innerHTML='';
-    q.ops.forEach(function(op,i){
-      var b=document.createElement('button');
-      b.textContent=op;
-      b.style.cssText='width:100%;text-align:left;padding:11px 14px;border:1.5px solid #ddd;border-radius:8px;font-size:14px;cursor:pointer;background:#fff;font-family:DM Sans,sans-serif;transition:background .15s';
-      b.onmouseover=function(){if(!_tvQan)this.style.background='${COLORL}';};
-      b.onmouseout=function(){if(!_tvQan&&this.style.background==='${COLORL}')this.style.background='#fff';};
-      b.onclick=function(){tvQAnswer(i,b,q);};
-      opts.appendChild(b);
-    });
-  }
-  function tvQAnswer(i,btn,q){
-    if(_tvQan)return;
-    _tvQan=true;
-    var btns=document.getElementById('tv-q-opts').querySelectorAll('button');
-    btns.forEach(function(b,bi){
-      b.style.border='1.5px solid '+(bi===q.c?'#1e7c73':'#ddd');
-      b.style.background=bi===q.c?'${COLORL}':(bi===i?'#FEECEC':'#fff');
-      b.style.fontWeight=bi===q.c?'700':'400';
-    });
-    if(i===q.c){_tvQsc+=100;document.getElementById('tv-q-score').textContent=_tvQsc+' pts';}
-    document.getElementById('tv-q-exp').textContent=q.exp||'';
-    document.getElementById('tv-q-next').style.display='inline-block';
-  }
-  function tvQNext(){
-    _tvQi++;
-    if(_tvQi>=_tvQs.length){
-      document.getElementById('tv-q-game').style.display='none';
-      document.getElementById('tv-q-end').style.display='block';
-      var pct=Math.round((_tvQsc/(_tvQs.length*100))*100);
-      var emoji=pct>=80?'🏆':pct>=50?'👍':'🌱';
-      var msg=pct>=80?'Excelente dominio del tema!':pct>=50?'Buen trabajo, sigue aprendiendo!':'Sigue aprendiendo sobre agricultura!';
-      document.getElementById('tv-q-emoji').textContent=emoji;
-      document.getElementById('tv-q-result').textContent=_tvQsc+' / '+(_tvQs.length*100)+' puntos';
-      document.getElementById('tv-q-final').textContent=msg;
-      document.getElementById('tv-q-bar').style.width='100%';
-    } else {
-      tvQShow();
-    }
-  }
+  var _tvQs=${JSON.stringify(gQs)};var _tvQi=0,_tvQsc=0,_tvQan=false;
+  function tvQStart(){_tvQi=0;_tvQsc=0;_tvQan=false;document.getElementById('tv-q-intro').style.display='none';document.getElementById('tv-q-end').style.display='none';document.getElementById('tv-q-game').style.display='block';tvQShow();}
+  function tvQShow(){var q=_tvQs[_tvQi];_tvQan=false;document.getElementById('tv-q-counter').textContent='Pregunta '+(_tvQi+1)+' de '+_tvQs.length;document.getElementById('tv-q-bar').style.width=((_tvQi/_tvQs.length)*100)+'%';document.getElementById('tv-q-score').textContent=_tvQsc+' pts';document.getElementById('tv-q-text').textContent=q.p;document.getElementById('tv-q-exp').textContent='';document.getElementById('tv-q-next').style.display='none';var opts=document.getElementById('tv-q-opts');opts.innerHTML='';q.ops.forEach(function(op,i){var b=document.createElement('button');b.textContent=op;b.style.cssText='width:100%;text-align:left;padding:11px 14px;border:1.5px solid #ddd;border-radius:8px;font-size:14px;cursor:pointer;background:#fff;font-family:DM Sans,sans-serif;transition:background .15s';b.onmouseover=function(){if(!_tvQan)this.style.background='${COLORL}';};b.onmouseout=function(){if(!_tvQan&&this.style.background==='${COLORL}')this.style.background='#fff';};b.onclick=function(){tvQAnswer(i,b,q);};opts.appendChild(b);});}
+  function tvQAnswer(i,btn,q){if(_tvQan)return;_tvQan=true;var btns=document.getElementById('tv-q-opts').querySelectorAll('button');btns.forEach(function(b,bi){b.style.border='1.5px solid '+(bi===q.c?'#1e7c73':'#ddd');b.style.background=bi===q.c?'${COLORL}':(bi===i?'#FEECEC':'#fff');b.style.fontWeight=bi===q.c?'700':'400';});if(i===q.c){_tvQsc+=100;document.getElementById('tv-q-score').textContent=_tvQsc+' pts';}document.getElementById('tv-q-exp').textContent=q.exp||'';document.getElementById('tv-q-next').style.display='inline-block';}
+  function tvQNext(){_tvQi++;if(_tvQi>=_tvQs.length){document.getElementById('tv-q-game').style.display='none';document.getElementById('tv-q-end').style.display='block';var pct=Math.round((_tvQsc/(_tvQs.length*100))*100);var emoji=pct>=80?'🏆':pct>=50?'👍':'🌱';var msg=pct>=80?'Excelente dominio del tema!':pct>=50?'Buen trabajo, sigue aprendiendo!':'Sigue aprendiendo sobre agricultura!';document.getElementById('tv-q-emoji').textContent=emoji;document.getElementById('tv-q-result').textContent=_tvQsc+' / '+(_tvQs.length*100)+' puntos';document.getElementById('tv-q-final').textContent=msg;document.getElementById('tv-q-bar').style.width='100%';}else{tvQShow();}}
   <\/script></div>`;
+  }
 
   // Render previews
   ['tabla','infografia','juego'].forEach(function(key){
@@ -1248,6 +1363,18 @@ async function generateInteractives(){
   });
 
   hide('interactive-loading');show('interactive-content');
+}
+
+async function regenerateOne(slot){
+  const apiKey=$('api-key').value.trim();
+  if(!apiKey){alert('API key requerida.');return;}
+  const btn=document.getElementById('tv-regen-'+slot);
+  if(btn){btn.textContent='...';btn.disabled=true;}
+  // Clear this slot's HTML so generateInteractives picks a new format
+  S.interactiveHTMLs[slot]='';
+  // Run full generation - it will pick a new format since we track used ones
+  await generateInteractives();
+  if(btn){btn.textContent='🔄 Otro';btn.disabled=false;}
 }
 
 
