@@ -1552,20 +1552,64 @@ async function sendToWP(){
   const excerpt=$('meta-excerpt').value;
   let fullContent=S.articleHTML;
   if(S.selectedInteractiveHTML)fullContent+='\n\n<div class="qp-interactive">'+S.selectedInteractiveHTML+'</div>';
+
+  // Date: 10 days from now
+  const pubDate=new Date();
+  pubDate.setDate(pubDate.getDate()+10);
+  const dateStr=pubDate.toISOString().slice(0,19);
+
   try{
+    // 1. Resolve category
     let catId=1;
     try{const cr=await fetch(url+'/wp-json/wp/v2/categories?search='+encodeURIComponent(S.cat)+'&per_page=1',{headers:{'Authorization':'Basic '+creds}});
       if(cr.ok){const cats=await cr.json();if(cats.length)catId=cats[0].id;}}catch(e){}
+
+    // 2. Resolve author by email
+    let authorId=0;
+    try{const ar=await fetch(url+'/wp-json/wp/v2/users?search=editor%40quepasamedia.com&per_page=1',{headers:{'Authorization':'Basic '+creds}});
+      if(ar.ok){const authors=await ar.json();if(authors.length)authorId=authors[0].id;}}catch(e){}
+
+    // 3. Upload featured image if DALL-E image exists
+    let featuredMediaId=0;
+    if(S.generatedImageBase64){
+      try{
+        btn.innerHTML='Subiendo imagen...';
+        const imgBlob=await fetch('data:image/png;base64,'+S.generatedImageBase64).then(r=>r.blob());
+        const imgSlug=(slug||'imagen')+'-featured.jpg';
+        const imgRes=await fetch(url+'/wp-json/wp/v2/media',{
+          method:'POST',
+          headers:{'Authorization':'Basic '+creds,'Content-Disposition':'attachment; filename="'+imgSlug+'"','Content-Type':'image/png'},
+          body:imgBlob
+        });
+        if(imgRes.ok){const imgData=await imgRes.json();featuredMediaId=imgData.id||0;}
+      }catch(e){console.warn('Image upload failed:',e);}
+    }
+
+    // 4. Create draft post
+    btn.innerHTML='Creando borrador...';
+    const postBody={
+      title,
+      content:fullContent,
+      slug,
+      excerpt,
+      status:'future',
+      date:dateStr,
+      categories:[catId]
+    };
+    if(authorId)postBody.author=authorId;
+    if(featuredMediaId)postBody.featured_media=featuredMediaId;
+
     const r=await fetch(url+'/wp-json/wp/v2/posts',{
       method:'POST',
       headers:{'Authorization':'Basic '+creds,'Content-Type':'application/json'},
-      body:JSON.stringify({title,content:fullContent,slug,excerpt,status:'draft',categories:[catId]})
+      body:JSON.stringify(postBody)
     });
     if(r.ok){
       const post=await r.json();
       const editUrl=url+'/wp-admin/post.php?post='+post.id+'&action=edit';
       res.className='wp-result ok';res.style.display='block';
-      res.innerHTML='Borrador creado. <a href="'+editUrl+'" target="_blank">Abrir en WordPress</a>';
+      const imgNote=featuredMediaId?' + imagen destacada':' (sin imagen — genera una con DALL-E primero)';
+      res.innerHTML='Borrador programado para '+pubDate.toLocaleDateString('es-MX',{day:'numeric',month:'long'})+imgNote+'. <a href="'+editUrl+'" target="_blank">Abrir en WordPress</a>';
     }else{
       const e=await r.json().catch(()=>({}));
       res.className='wp-result err';res.style.display='block';
