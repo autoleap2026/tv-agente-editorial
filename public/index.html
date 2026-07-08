@@ -298,6 +298,15 @@ a{color:var(--verde)}
     <div class="field">
       <label>Fuente o contexto adicional <span style="font-weight:400;text-transform:none;letter-spacing:0">(opcional)</span></label>
       <textarea id="fuente" placeholder="Pega aquí el comunicado de prensa, URL, datos clave o notas..." style="min-height:80px"></textarea>
+      <div id="fuente-drop" onclick="document.getElementById('fuente-file').click()"
+        style="margin-top:8px;border:1.5px dashed var(--border-dark);border-radius:var(--radius);padding:12px 16px;text-align:center;cursor:pointer;background:var(--bg);transition:background .15s"
+        ondragover="event.preventDefault();this.style.background='var(--bg-card)'"
+        ondragleave="this.style.background='var(--bg)'"
+        ondrop="event.preventDefault();this.style.background='var(--bg)';handleFuenteFile(event.dataTransfer.files[0])">
+        <input type="file" id="fuente-file" accept=".pdf,.doc,.docx,.jpg,.jpeg,.png,.webp" style="display:none" onchange="handleFuenteFile(this.files[0])"/>
+        <span id="fuente-file-label" style="font-size:12px;color:var(--text-muted)">&#128206; Adjuntar PDF, Word o imagen como fuente &mdash; arrastra o haz clic</span>
+      </div>
+      <div id="fuente-file-status" style="display:none;margin-top:6px;font-size:12px;padding:8px 12px;border-radius:var(--radius);background:var(--bg-card);color:var(--text-muted)"></div>
     </div>
     <div class="field">
       <label>Categoría WordPress</label>
@@ -1617,6 +1626,54 @@ async function sendToWP(){
     }
   }catch(e){res.className='wp-result err';res.style.display='block';res.textContent='Error: '+e.message;}
   btn.disabled=false;btn.innerHTML='Crear borrador en WordPress';
+}
+
+// FILE TO FUENTE
+async function handleFuenteFile(file){
+  if(!file)return;
+  var status=document.getElementById('fuente-file-status');
+  var label=document.getElementById('fuente-file-label');
+  status.style.display='block';
+  status.style.color='var(--text-muted)';
+  status.textContent='Leyendo '+file.name+'...';
+  label.textContent='\u{1F4CE} '+file.name;
+  var apiKey=$('api-key').value.trim();
+  var ext=file.name.split('.').pop().toLowerCase();
+  try{
+    var extractedText='';
+    if(ext==='jpg'||ext==='jpeg'||ext==='png'||ext==='webp'){
+      if(!apiKey){status.textContent='API key requerida para extraer texto de imagenes.';return;}
+      var b64=await fileToBase64(file);
+      var mime=ext==='png'?'image/png':ext==='webp'?'image/webp':'image/jpeg';
+      var d=await anthroFetch(apiKey,{model:'claude-sonnet-4-6',max_tokens:2000,messages:[{role:'user',content:[{type:'image',source:{type:'base64',media_type:mime,data:b64}},{type:'text',text:'Extract all text and key information from this image. Return only the extracted content, no commentary.'}]}]});
+      extractedText=(d.content&&d.content[0]&&d.content[0].text)||'';
+    }else if(ext==='pdf'){
+      if(!apiKey){status.textContent='API key requerida para extraer texto de PDFs.';return;}
+      var b64=await fileToBase64(file);
+      var d=await anthroFetch(apiKey,{model:'claude-sonnet-4-6',max_tokens:3000,messages:[{role:'user',content:[{type:'document',source:{type:'base64',media_type:'application/pdf',data:b64}},{type:'text',text:'Extract all key information, facts, figures, dates and data from this document. Return only the extracted content in plain text, no commentary.'}]}]});
+      extractedText=(d.content&&d.content[0]&&d.content[0].text)||'';
+    }else if(ext==='docx'||ext==='doc'){
+      if(!apiKey){status.textContent='API key requerida para extraer texto de documentos Word.';return;}
+      var b64=await fileToBase64(file);
+      var d=await anthroFetch(apiKey,{model:'claude-sonnet-4-6',max_tokens:3000,messages:[{role:'user',content:[{type:'document',source:{type:'base64',media_type:'application/vnd.openxmlformats-officedocument.wordprocessingml.document',data:b64}},{type:'text',text:'Extract all key information, facts, figures, dates and data from this document. Return only the extracted content in plain text, no commentary.'}]}]});
+      extractedText=(d.content&&d.content[0]&&d.content[0].text)||'';
+    }
+    if(extractedText.trim()){
+      var existing=$('fuente').value.trim();
+      $('fuente').value=(existing?existing+'\n\n---\n\n':'')+extractedText.trim();
+      status.style.color='#1e7c73';
+      status.textContent='Texto extraido de '+file.name+' ('+extractedText.trim().length+' caracteres). Revisa el campo arriba.';
+    }else{
+      status.style.color='#92600A';
+      status.textContent='No se pudo extraer texto. Puedes pegarlo manualmente arriba.';
+    }
+  }catch(e){
+    status.style.color='#991B1B';
+    status.textContent='Error: '+e.message;
+  }
+}
+function fileToBase64(file){
+  return new Promise(function(resolve,reject){var r=new FileReader();r.onload=function(){resolve(r.result.split(',')[1]);};r.onerror=reject;r.readAsDataURL(file);});
 }
 
 // RESET
