@@ -810,8 +810,27 @@ function updateMetaCount(el,cid,max){
 
 // RESEARCH
 async function researchTopic(apiKey, tema, fuente){
-  const currentYear=new Date().getFullYear();
-  const prompt='Research this agricultural topic thoroughly for a Spanish-language article. Search for the most accurate, current official information. TOPIC: '+tema+(fuente?' EDITOR NOTES: '+fuente.substring(0,400):'')+' Search for: (1) If there is an NRCS practice code number mentioned, find the exact official NRCS practice standard for that code (name, definition, purpose, conditions where it applies). (2) Any relevant USDA or NRCS program details, eligibility, and how farmers apply. (3) Any specific data, statistics, or recent announcements related to this topic in North Carolina or the US. Return a structured summary of what you found: exact practice name (if applicable), official definition, key facts, eligibility requirements, and any NC-specific information. Be precise - this will be used as the factual foundation for a news article.';
+  // Detect state from topic or fuente
+  const stateMap={'puerto rico':'Puerto Rico','new mexico':'New Mexico','nuevo mexico':'New Mexico','texas':'Texas','california':'California','florida':'Florida','georgia':'Georgia','colorado':'Colorado','arizona':'Arizona','washington':'Washington','oregon':'Oregon','idaho':'Idaho','north carolina':'North Carolina','carolina del norte':'North Carolina','south carolina':'South Carolina','virginia':'Virginia','tennessee':'Tennessee','kentucky':'Kentucky','alabama':'Alabama','mississippi':'Mississippi'};
+  const combined=(tema+' '+(fuente||'')).toLowerCase();
+  let detectedState='North Carolina';
+  let stateExt='NC State Extension (ces.ncsu.edu)';
+  for(const key in stateMap){
+    if(combined.includes(key)){
+      detectedState=stateMap[key];
+      if(detectedState==='Puerto Rico')stateExt='Universidad de Puerto Rico Recinto de Mayaguez Extension Agricola (upr.edu)';
+      else if(detectedState==='Texas')stateExt='Texas A&M AgriLife Extension (agrilifeextension.tamu.edu)';
+      else if(detectedState==='California')stateExt='UC Cooperative Extension (ucanr.edu)';
+      else if(detectedState==='Florida')stateExt='UF/IFAS Extension (ifas.ufl.edu)';
+      else if(detectedState==='Georgia')stateExt='UGA Extension (extension.uga.edu)';
+      else if(detectedState==='New Mexico')stateExt='NMSU Cooperative Extension (extension.nmsu.edu)';
+      else if(detectedState==='Colorado')stateExt='CSU Extension (extension.colostate.edu)';
+      else if(detectedState==='Arizona')stateExt='University of Arizona Cooperative Extension (extension.arizona.edu)';
+      else stateExt=detectedState+' State Cooperative Extension';
+      break;
+    }
+  }
+  const prompt='Research this agricultural topic thoroughly for a Spanish-language article. Search for the most accurate, current official information. TOPIC: '+tema+(fuente?' EDITOR NOTES: '+fuente.substring(0,400):'')+' Search for: (1) If there is an NRCS practice code number mentioned, find the exact official NRCS practice standard for that code (name, definition, purpose, conditions where it applies). (2) Any relevant USDA or NRCS program details, eligibility, and how farmers apply. (3) Any specific data, statistics, or recent announcements related to this topic in '+detectedState+' or the US. Prioritize official sources: USDA, NRCS, FSA, '+stateExt+', and FAO. Return a structured summary of what you found: exact practice name (if applicable), official definition, key facts, eligibility requirements, and any '+detectedState+'-specific information. Be precise - this will be used as the factual foundation for a news article.';
   const d=await anthroFetch(apiKey,{
     model:'claude-sonnet-4-6',max_tokens:2000,
     tools:[{type:'web_search_20250305',name:'web_search'}],
@@ -856,7 +875,8 @@ async function generateArticle(){
   const ctxBlock=researchTrimmed?('\n\nFUENTES VERIFICADAS (usa SOLO estos datos para hechos, nombres de programas, codigos y cifras - no inventes nada que no este aqui):\n'+researchTrimmed):'';
   // Brief pause so the two API calls don't hit the rate limit in the same minute window
   await new Promise(r=>setTimeout(r,2000));
-  const userMsg='Escribe un articulo de Tipo '+S.tipo+' ('+TIPO_NAMES[S.tipo]+', '+TIPO_EXT[S.tipo]+' palabras) para la seccion de Agricultura de Que Pasa Media.\n\nTEMA: '+tema+'\nCATEGORIA: '+S.cat+'\n'+(fuente?'CONTEXTO DEL EDITOR:\n'+fuente:'')+ctxBlock;
+  const fuenteBlock=fuente?'FUENTE PRIMARIA DEL EDITOR (cita esta fuente directamente en el articulo con su nombre o URL real - no la sustituyas por NRCS u otra agencia a menos que sea la misma fuente):\n'+fuente:'';
+  const userMsg='Escribe un articulo de Tipo '+S.tipo+' ('+TIPO_NAMES[S.tipo]+', '+TIPO_EXT[S.tipo]+' palabras) para la seccion de Agricultura de Que Pasa Media.\n\nTEMA: '+tema+'\nCATEGORIA: '+S.cat+'\n'+fuenteBlock+ctxBlock;
 
   try{
     const d=await anthroFetch(apiKey,{
