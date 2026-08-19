@@ -1167,12 +1167,12 @@ async function generateInteractiveSingle(apiKey,title,body,tipo,ALL_FORMATS,avoi
   show('interactive-content');
 }
 
-function switchFormat(fmtId){
-  var plan=S.currentPlan;
-  var COLOR=S.currentCOLOR||'#1e7c73';
-  var COLORL=S.currentCOLORL||'#e8f5f4';
-  var COLORA=S.currentCOLORA||'#93bc52';
+async function switchFormat(fmtId){
+  const apiKey=$('api-key').value.trim();
+  if(!apiKey){alert('API key requerida.');return;}
   var ALL_FORMATS=S.currentALL_FORMATS||[];
+  const fmtMeta=ALL_FORMATS.find(f=>f.id===fmtId)||{icon:'🎯',label:fmtId};
+
   // Save to recently used
   let recentlyUsed=[];
   try{recentlyUsed=JSON.parse(localStorage.getItem('tv_recent_formats')||'[]');}catch(e){}
@@ -1180,18 +1180,64 @@ function switchFormat(fmtId){
   if(recentlyUsed.length>8)recentlyUsed=recentlyUsed.slice(-8);
   try{localStorage.setItem('tv_recent_formats',JSON.stringify(recentlyUsed));}catch(e){}
   S.currentFmt=fmtId;
-  buildWidget(fmtId,plan,COLOR,COLORL,COLORA);
-  const fmtMeta=ALL_FORMATS.find(f=>f.id===fmtId)||{icon:'🎯',label:fmtId};
+
+  // Update header immediately
   var el=$('ic-single-emoji');if(el)el.textContent=fmtMeta.icon;
   var tl=$('ic-single-title');if(tl)tl.textContent=fmtMeta.label;
-  var sb=$('ic-single-sub');if(sb)sb.textContent='';
+  var sb=$('ic-single-sub');if(sb)sb.textContent='Generando...';
+
+  // Show loading in preview
   var preview=$('ic-preview-single');
+  preview.innerHTML='<div style="padding:20px;text-align:center;color:#666;font-size:13px;font-family:DM Sans,sans-serif">Generando '+fmtMeta.label+'...</div>';
+
+  const title=S.currentPlan&&S.currentPlan.titulo||$('meta-title').value||'';
+  const body=S.articleText?S.articleText.split('\n').filter(l=>l.trim()).slice(0,10).join(' ').substring(0,1200):'';
+  const COLOR='#1e7c73';
+  const COLORL='#e8f5f4';
+  const COLORA='#93bc52';
+
+  // Format-specific instructions
+  const fmtInstructions={
+    tabla_comparativa:'Create a sortable HTML comparison table with 3 columns and 5 rows of real data from the article. Include a search input above the table.',
+    checklist_elegibilidad:'Create an interactive HTML checklist with 5-6 eligibility requirements. Each item has a checkbox. Show a result message based on how many boxes are checked.',
+    calculadora:'Create an HTML calculator with 2-3 numeric inputs relevant to the article (acres, animals, budget etc). Show a calculated result when the user clicks Calcular.',
+    comparador_programas:'Create an HTML side-by-side comparison of 2-3 programs or options mentioned in the article, in a clean table format.',
+    cronograma_fechas:'Create an HTML visual calendar/timeline showing key dates and deadlines from the article across months.',
+    infografia_stats:'Create an animated HTML infographic with 4 key statistics from the article. Numbers count up from 0 on load. Use icons/emojis. Be creative with the layout - NOT always a 2x2 grid.',
+    calendario_agricola:'Create an HTML 12-month agricultural calendar showing seasonal activities relevant to the article topic. Highlight the current month.',
+    paso_a_paso:'Create an interactive HTML step-by-step guide. User taps each step to expand it. Use the article process/steps.',
+    glosario_terminos:'Create an interactive HTML glossary of 5-6 key terms from the article. Tap a term to reveal its plain-language definition.',
+    quiz_conocimiento:'Create an HTML multiple-choice quiz with 4 questions about the article content. Show score at the end. Make questions genuinely informative.',
+    verdadero_falso:'Create an HTML true/false game with 5 statements from the article. Show explanation after each answer.',
+    memoria_pares:'Create an HTML matching game pairing 4 terms with their definitions from the article.',
+    ordenar_pasos:'Create an HTML drag-and-drop step ordering game using the process steps from the article.'
+  };
+
+  const instruction=fmtInstructions[fmtId]||'Create an engaging interactive HTML widget based on the article content.';
+
+  try{
+    const d=await anthroFetch(apiKey,{
+      model:'claude-sonnet-4-6',max_tokens:3000,
+      messages:[{role:'user',content:'Create a self-contained interactive HTML widget for a Spanish-language agricultural article. The widget will be embedded in a WordPress post.\n\nARTICLE TITLE: '+title+'\nARTICLE CONTENT: '+body+'\n\nWIDGET TYPE: '+fmtMeta.label+'\nINSTRUCTIONS: '+instruction+'\n\nDESIGN RULES:\n- Use ONLY inline styles (no external CSS)\n- Font family: DM Sans, sans-serif\n- Primary color: '+COLOR+' (dark green)\n- Light background: '+COLORL+'\n- Accent: '+COLORA+' (lime green)\n- All text in Spanish\n- Mobile friendly, max-width 600px\n- Use real data from the article, not placeholder text\n- Be creative with layout and visual design - vary it each time\n- No <html>, <head>, <body> tags - just the widget div and a <script> tag\n\nReturn ONLY the HTML code, nothing else.'}]
+    });
+    const html=(d.content&&d.content[0]&&d.content[0].text)||'';
+    if(html.trim()){
+      S.interactiveHTMLs.single=html.trim();
+    }else{
+      S.interactiveHTMLs.single='<div style="padding:16px;font-family:DM Sans,sans-serif;color:#666">No se pudo generar el elemento. Intenta de nuevo.</div>';
+    }
+  }catch(e){
+    S.interactiveHTMLs.single='<div style="padding:16px;font-family:DM Sans,sans-serif;color:#991B1B">Error: '+e.message+'</div>';
+  }
+
+  // Render preview
   var iframe=document.createElement('iframe');
   iframe.style.cssText='width:100%;height:200px;border:none;border-radius:6px';
   iframe.setAttribute('sandbox','allow-scripts allow-same-origin');
   preview.innerHTML='';preview.appendChild(iframe);
   var doc=iframe.contentDocument||iframe.contentWindow.document;
   doc.open();doc.write(S.interactiveHTMLs.single);doc.close();
+  var sb2=$('ic-single-sub');if(sb2)sb2.textContent='';
   selectInteractive('single');
 }
 
