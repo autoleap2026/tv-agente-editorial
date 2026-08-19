@@ -82,7 +82,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
 .tipo-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
 .tipo-btn{padding:12px 14px;border:1.5px solid var(--border-dark);border-radius:var(--radius);cursor:pointer;background:var(--bg-card);text-align:left;transition:all .15s;font-family:'DM Sans',sans-serif}
 .tipo-btn:hover{border-color:var(--verde-mid);background:var(--verde-pale)}
-.tipo-btn.sel{border-color:var(--verde);background:var(--verde-light)}
+.tipo-btn.sel{border-color:var(--verde)!important;background:var(--verde-light)!important}
 .tipo-btn .tn{font-size:10px;font-weight:600;color:var(--verde-mid);letter-spacing:.08em;text-transform:uppercase;display:block;margin-bottom:3px}
 .tipo-btn .tt{font-size:13px;font-weight:600;color:var(--text);display:block}
 .tipo-btn.sel .tt{color:var(--verde-dark)}
@@ -1051,7 +1051,7 @@ function handleImgUpload(input){
 
 // INTERACTIVE ELEMENTS
 // Template-based approach: Claude provides DATA only, JS logic is pre-built
-async async function generateInteractives(){
+async function generateInteractives(){
   const apiKey=$('api-key').value.trim();
   if(!apiKey){$('interactive-load-msg').textContent='API key requerida.';return;}
   show('interactive-loading');hide('interactive-content');
