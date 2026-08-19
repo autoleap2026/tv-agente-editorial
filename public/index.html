@@ -1051,7 +1051,7 @@ function handleImgUpload(input){
 
 // INTERACTIVE ELEMENTS
 // Template-based approach: Claude provides DATA only, JS logic is pre-built
-async function generateInteractives(){
+async async function generateInteractives(){
   const apiKey=$('api-key').value.trim();
   if(!apiKey){$('interactive-load-msg').textContent='API key requerida.';return;}
   show('interactive-loading');hide('interactive-content');
@@ -1083,7 +1083,7 @@ async function generateInteractives(){
 
   $('interactive-load-msg').textContent='Eligiendo el mejor formato...';
 
-  generateInteractiveSingle(apiKey,title,body,tipo,ALL_FORMATS,avoidList);
+  await generateInteractiveSingle(apiKey,title,body,tipo,ALL_FORMATS,avoidList);
 }
 
 async function generateInteractiveSingle(apiKey,title,body,tipo,ALL_FORMATS,avoidList){
@@ -1119,6 +1119,10 @@ async function generateInteractiveSingle(apiKey,title,body,tipo,ALL_FORMATS,avoi
 
   S.currentFmt=chosenFmt;
   S.currentPlan=plan;
+  S.currentALL_FORMATS=ALL_FORMATS;
+  S.currentCOLOR=COLOR;
+  S.currentCOLORL=COLORL;
+  S.currentCOLORA=COLORA;
 
   $('interactive-load-msg').textContent='Construyendo elemento interactivo...';
 
@@ -1151,7 +1155,7 @@ async function generateInteractiveSingle(apiKey,title,body,tipo,ALL_FORMATS,avoi
       btn.className='btn btn-outline btn-sm';
       btn.style.cssText='font-size:11px;padding:4px 10px';
       btn.textContent=f.icon+' '+f.label;
-      btn.onclick=function(){switchFormat(f.id,apiKey,plan,COLOR,COLORL,COLORA,ALL_FORMATS);};
+      btn.onclick=function(){switchFormat(f.id);};
       pills.appendChild(btn);
     });
     switcher.style.display='block';
@@ -1163,14 +1167,18 @@ async function generateInteractiveSingle(apiKey,title,body,tipo,ALL_FORMATS,avoi
   show('interactive-content');
 }
 
-function switchFormat(fmtId,apiKey,plan,COLOR,COLORL,COLORA,ALL_FORMATS){
+function switchFormat(fmtId){
+  var plan=S.currentPlan;
+  var COLOR=S.currentCOLOR||'#1e7c73';
+  var COLORL=S.currentCOLORL||'#e8f5f4';
+  var COLORA=S.currentCOLORA||'#93bc52';
+  var ALL_FORMATS=S.currentALL_FORMATS||[];
   // Save to recently used
   let recentlyUsed=[];
   try{recentlyUsed=JSON.parse(localStorage.getItem('tv_recent_formats')||'[]');}catch(e){}
   recentlyUsed.push(fmtId);
   if(recentlyUsed.length>8)recentlyUsed=recentlyUsed.slice(-8);
   try{localStorage.setItem('tv_recent_formats',JSON.stringify(recentlyUsed));}catch(e){}
-
   S.currentFmt=fmtId;
   buildWidget(fmtId,plan,COLOR,COLORL,COLORA);
   const fmtMeta=ALL_FORMATS.find(f=>f.id===fmtId)||{icon:'🎯',label:fmtId};
