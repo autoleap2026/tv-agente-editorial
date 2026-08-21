@@ -631,6 +631,13 @@ a{color:var(--verde)}
     <div style="background:var(--bg);border:1px solid var(--border);border-radius:var(--radius);padding:28px;margin-bottom:4px">
       <div class="preview-article" id="final-preview-content"></div>
     </div>
+    <div style="margin-top:16px;padding:14px 16px;background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius)">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">
+        <span style="font-size:11px;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:.08em">Meta description (SEO)</span>
+        <button class="btn btn-outline btn-sm" style="font-size:11px;padding:3px 10px" onclick="copyText(document.getElementById('final-meta-desc').textContent,'btn-copy-meta')" id="btn-copy-meta">&#128203; Copiar</button>
+      </div>
+      <p id="final-meta-desc" style="font-size:13px;color:var(--text);margin:0;line-height:1.6"></p>
+    </div>
     <p style="font-size:11px;color:var(--text-light);margin-bottom:4px;margin-top:8px">Esta es una representación aproximada del artículo en WordPress.</p>
     <div class="btn-row">
       <button class="btn btn-green" onclick="goToStep(7)">Enviar a WordPress →</button>
@@ -1222,7 +1229,7 @@ async function switchFormat(fmtId){
     });
     const html=(d.content&&d.content[0]&&d.content[0].text)||'';
     if(html.trim()){
-      S.interactiveHTMLs.single=html.trim();
+      S.interactiveHTMLs.single=html.trim().replace(/^```html?\s*/i,'').replace(/```\s*$/,'').trim();
     }else{
       S.interactiveHTMLs.single='<div style="padding:16px;font-family:DM Sans,sans-serif;color:#666">No se pudo generar el elemento. Intenta de nuevo.</div>';
     }
@@ -1434,6 +1441,8 @@ function buildFinalPreview(){
     ?'<div class="preview-interactive"><div class="preview-interactive-label">'+(S.selectedGameLabel||'Juego interactivo')+'</div>'+S.selectedInteractiveHTML+'</div>'
     :'<div class="preview-interactive"><div class="preview-interactive-label">Elemento interactivo</div><div style="padding:20px;text-align:center;color:#999;font-size:13px">Selecciona un elemento en el Paso 4</div></div>';
   $('final-preview-content').innerHTML=imgHTML+'<h1>'+title+'</h1><div class="preview-meta">Tierra Viva · Agricultura · '+date+' · '+S.cat+'</div>'+bodyHTML+interHTML;
+  var metaEl=document.getElementById('final-meta-desc');
+  if(metaEl)metaEl.textContent=$('meta-excerpt').value||'';
 }
 
 // WORDPRESS
@@ -1475,8 +1484,20 @@ async function sendToWP(){
   const title=$('meta-title').value;
   const slug=$('wp-final-slug').value;
   const excerpt=$('meta-excerpt').value;
-  let fullContent=S.articleHTML;
-  if(S.selectedInteractiveHTML)fullContent+='\n\n<div class="qp-interactive">'+S.selectedInteractiveHTML+'</div>';
+  function toWPBlocks(html){
+    var temp=document.createElement('div');temp.innerHTML=html;var blocks='';
+    temp.childNodes.forEach(function(node){
+      if(node.nodeType===3){var txt=node.textContent.trim();if(txt)blocks+='<!-- wp:paragraph -->\n<p>'+txt+'</p>\n<!-- /wp:paragraph -->\n\n';}
+      else if(node.nodeName==='P'){blocks+='<!-- wp:paragraph -->\n<p>'+node.innerHTML+'</p>\n<!-- /wp:paragraph -->\n\n';}
+      else if(/^H[1-6]$/.test(node.nodeName)){var lvl=node.nodeName.slice(1);blocks+='<!-- wp:heading {"level":'+lvl+'} -->\n<h'+lvl+'>'+node.innerHTML+'</h'+lvl+'>\n<!-- /wp:heading -->\n\n';}
+      else if(node.nodeName==='UL'||node.nodeName==='OL'){var t=node.nodeName.toLowerCase();blocks+='<!-- wp:list -->\n<'+t+'>'+node.innerHTML+'</'+t+'>\n<!-- /wp:list -->\n\n';}
+      else{var o=node.outerHTML||'';if(o.trim())blocks+='<!-- wp:html -->\n'+o+'\n<!-- /wp:html -->\n\n';}
+    });
+    if(!blocks.trim())html.split(/\n\n+/).forEach(function(p){p=p.trim();if(p)blocks+='<!-- wp:paragraph -->\n<p>'+p+'</p>\n<!-- /wp:paragraph -->\n\n';});
+    return blocks;
+  }
+  let fullContent=toWPBlocks(S.articleHTML||'');
+  if(S.selectedInteractiveHTML)fullContent+='\n<!-- wp:html -->\n<div class="qp-interactive">'+S.selectedInteractiveHTML+'</div>\n<!-- /wp:html -->\n';
 
   // Date: 10 days from now
   const pubDate=new Date();
