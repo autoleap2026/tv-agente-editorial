@@ -1002,7 +1002,7 @@ async function generateDALLE(){
     const resp=await fetch('/api/openai',{
       method:'POST',
       headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({prompt:prompt,size:'1536x1024',quality:'standard'})
+      body:JSON.stringify({prompt:prompt,size:'1536x1024',quality:'medium'})
     });
     const data=await resp.json();
     if(!resp.ok){throw new Error((data.error&&data.error.message)||'HTTP '+resp.status);}
