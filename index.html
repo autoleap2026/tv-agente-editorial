@@ -967,22 +967,27 @@ async function generateImgPrompt(){
   const apiKey=$('api-key').value.trim();
   const title=$('meta-title').value||S.articleText.split('\n')[0]||$('tema').value;
   const bodyLines=S.articleText.split('\n').filter(function(l){return l.trim()&&l.trim().length>30;});
-  const excerpt=bodyLines.slice(1,4).join(' ').substring(0,500);
+  const excerpt=bodyLines.slice(1,4).join(' ').substring(0,600);
   const context=excerpt?title+'\n\n'+excerpt:title;
+  // Random variety elements to ensure different images each generation
+  const angles=['wide establishing shot','close-up detail shot','medium shot at eye level','low angle shot','overhead aerial perspective','candid documentary shot'];
+  const times=['golden hour sunrise','midday bright sun','late afternoon warm light','overcast soft light','early morning mist'];
+  const angle=angles[Math.floor(Math.random()*angles.length)];
+  const time=times[Math.floor(Math.random()*times.length)];
   $('img-prompt-text').textContent='Generando prompt...';
   if(!apiKey){
-    S.imgPromptText='Photorealistic photograph, 16:9, rural '+detectLocation()+' farmland, Hispanic farmworker, warm golden hour lighting, no text, photojournalism style. Topic: '+title;
+    S.imgPromptText='Photorealistic documentary photograph, '+angle+', '+time+', rural '+detectLocation()+' farmland, Hispanic farmworker, no text. Topic: '+title;
     $('img-prompt-text').textContent=S.imgPromptText;return;
   }
   try{
     const d=await anthroFetch(apiKey,{
-      model:'claude-sonnet-4-6',max_tokens:300,
-      messages:[{role:'user',content:'Generate a concise DALL-E 3 image prompt in English for this agricultural news article. The image MUST visually represent the specific subject of the article - if it is about cattle, show cattle; if about a pest or worm, show that; if about equipment, show that. Dignified realistic scene in '+detectLocation()+'. 16:9 photojournalism style. No text in image. Return ONLY the prompt.\n\nARTICLE:\n'+context}]
+      model:'claude-sonnet-4-6',max_tokens:500,
+      messages:[{role:'user',content:'Generate a specific, vivid DALL-E 3 image prompt in English for this agricultural news article. Rules:\n- The image MUST show the exact subject: if cattle, show cattle; if a specific crop, show that crop; if equipment, show that equipment; if a person receiving aid, show that scene\n- Use this specific angle: '+angle+'\n- Use this lighting: '+time+'\n- Location: '+detectLocation()+' agricultural setting\n- Style: realistic documentary photojournalism, NOT stock photo, NOT illustration\n- Show Hispanic farmworkers with dignity when people are included\n- Include specific realistic details (mud on boots, weathered hands, actual field conditions)\n- NO text, logos, or watermarks in the image\n- Return ONLY the prompt, 2-4 sentences, highly specific\n\nARTICLE:\n'+context}]
     });
-    S.imgPromptText=(d.content&&d.content[0]&&d.content[0].text)||'Photorealistic, '+detectLocation()+' farmland, Hispanic farmer, golden hour, 16:9, photojournalism style. Topic: '+title;
+    S.imgPromptText=(d.content&&d.content[0]&&d.content[0].text)||'Realistic documentary photograph, '+angle+', '+time+', '+detectLocation()+' farmland, Hispanic farmer working, no text. Topic: '+title;
     $('img-prompt-text').textContent=S.imgPromptText;
   }catch(e){
-    S.imgPromptText='Photorealistic photograph, 16:9, '+detectLocation()+' farmland, Hispanic farmworker with dignity, warm golden hour lighting, no text, photojournalism style. Topic: '+title;
+    S.imgPromptText='Realistic documentary photograph, '+angle+', '+time+', '+detectLocation()+' agricultural scene, Hispanic farmworker with dignity, no text. Topic: '+title;
     $('img-prompt-text').textContent=S.imgPromptText;
   }
 }
@@ -994,19 +999,19 @@ async function generateDALLE(){
   hide('dalle-result-area');hide('dalle-error');show('dalle-loading');
   const btn=$('btn-dalle');if(btn)btn.disabled=true;
   try{
-    const seed=Date.now()%99999;
-    const promptWithSeed=prompt+' [ref:'+seed+']';
     const resp=await fetch('/api/openai',{
       method:'POST',
       headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({prompt:promptWithSeed,size:'1536x1024',quality:'medium'})
+      body:JSON.stringify({prompt:prompt,size:'1536x1024',quality:'standard'})
     });
     const data=await resp.json();
     if(!resp.ok){throw new Error((data.error&&data.error.message)||'HTTP '+resp.status);}
     const item=data.data&&data.data[0];
     const b64=item?(item.b64_json||(item.url&&item.url.indexOf('data:')===0?item.url.split(',')[1]:null)):null;
     if(!b64)throw new Error('No image received.');
-    S.generatedImageBase64='data:image/png;base64,'+b64;
+    // Compress to JPEG under 2MB
+    const compressed=await compressImage('data:image/png;base64,'+b64,1536,1024,0.82);
+    S.generatedImageBase64=compressed;
     $('dalle-preview').src=S.generatedImageBase64;
     hide('dalle-loading');show('dalle-result-area');
     $('meta-img-status').textContent='DALL-E 3 generada';
@@ -1049,10 +1054,41 @@ function launchExternal(tool){
   window.open(urls[tool],'_blank');
   show('img-launch-confirm');setTimeout(()=>hide('img-launch-confirm'),5000);
 }
+function compressImage(dataUrl,maxW,maxH,quality){
+  return new Promise(function(resolve){
+    var img=new Image();
+    img.onload=function(){
+      var w=img.width,h=img.height;
+      // Scale down if larger than maxW/maxH
+      var scale=Math.min(maxW/w,maxH/h,1);
+      var tw=Math.round(w*scale),th=Math.round(h*scale);
+      var canvas=document.createElement('canvas');
+      canvas.width=tw;canvas.height=th;
+      var ctx=canvas.getContext('2d');
+      ctx.drawImage(img,0,0,tw,th);
+      // Try quality levels until under 2MB
+      var q=quality||0.82;
+      var result=canvas.toDataURL('image/jpeg',q);
+      var kb=Math.round(result.length*0.75/1024);
+      if(kb>2000&&q>0.5){result=canvas.toDataURL('image/jpeg',0.65);kb=Math.round(result.length*0.75/1024);}
+      if(kb>2000){result=canvas.toDataURL('image/jpeg',0.5);}
+      resolve(result);
+    };
+    img.onerror=function(){resolve(dataUrl);}; // fallback to original if error
+    img.src=dataUrl;
+  });
+}
+
 function handleImgUpload(input){
   const file=input.files[0];if(!file)return;
   const reader=new FileReader();
-  reader.onload=e=>{S.generatedImageBase64=e.target.result;$('meta-img-status').textContent='Imagen subida';};
+  reader.onload=async function(e){
+    const compressed=await compressImage(e.target.result,1536,1024,0.82);
+    S.generatedImageBase64=compressed;
+    $('meta-img-status').textContent='Imagen subida y optimizada';
+    // Update preview if visible
+    var prev=$('dalle-preview');if(prev){prev.src=compressed;show('dalle-result-area');}
+  };
   reader.readAsDataURL(file);
 }
 
