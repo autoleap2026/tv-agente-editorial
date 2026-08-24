@@ -1002,7 +1002,7 @@ async function generateDALLE(){
     const resp=await fetch('/api/openai',{
       method:'POST',
       headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({prompt:prompt,size:'1536x1024',quality:'medium'})
+      body:JSON.stringify({prompt:prompt,size:'1536x1024'})
     });
     const data=await resp.json();
     if(!resp.ok){throw new Error((data.error&&data.error.message)||'HTTP '+resp.status);}
@@ -1556,11 +1556,12 @@ async function sendToWP(){
     if(S.generatedImageBase64){
       try{
         btn.innerHTML='Subiendo imagen...';
-        const imgBlob=await fetch('data:image/png;base64,'+S.generatedImageBase64).then(r=>r.blob());
-        const imgSlug=(slug||'imagen')+'-featured.jpg';
+        const imgBlob=await fetch(S.generatedImageBase64).then(r=>r.blob());
+        const isJpeg=S.generatedImageBase64.startsWith('data:image/jpeg');
+        const imgSlug=(slug||'imagen')+'-featured.'+(isJpeg?'jpg':'png');
         const imgRes=await fetch(url+'/wp-json/wp/v2/media',{
           method:'POST',
-          headers:{'Authorization':'Basic '+creds,'Content-Disposition':'attachment; filename="'+imgSlug+'"','Content-Type':'image/png'},
+          headers:{'Authorization':'Basic '+creds,'Content-Disposition':'attachment; filename="'+imgSlug+'"','Content-Type':isJpeg?'image/jpeg':'image/png'},
           body:imgBlob
         });
         if(imgRes.ok){const imgData=await imgRes.json();featuredMediaId=imgData.id||0;}
