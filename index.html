@@ -1510,16 +1510,12 @@ async function testWP(){
 }
 
 async function sendToWP(){
-  const url=$('wp-url').value.trim().replace(/\/$/,'');
-  const user=$('wp-user').value.trim();
-  const pass=$('wp-pass').value.trim();
   const btn=$('btn-send-wp');const res=$('wp-result');
-  if(!user||!pass){res.className='wp-result err';res.style.display='block';res.textContent='Completa las credenciales de WordPress.';return;}
   btn.disabled=true;btn.innerHTML='Enviando...';
-  const creds=btoa(user+':'+pass);
   const title=$('meta-title').value;
   const slug=$('wp-final-slug').value;
   const excerpt=$('meta-excerpt').value;
+
   function toWPBlocks(html){
     var temp=document.createElement('div');temp.innerHTML=html;var blocks='';
     temp.childNodes.forEach(function(node){
@@ -1532,73 +1528,50 @@ async function sendToWP(){
     if(!blocks.trim())html.split(/\n\n+/).forEach(function(p){p=p.trim();if(p)blocks+='<!-- wp:paragraph -->\n<p>'+p+'</p>\n<!-- /wp:paragraph -->\n\n';});
     return blocks;
   }
+
   let fullContent=toWPBlocks(S.articleHTML||'');
   if(S.selectedInteractiveHTML)fullContent+='\n<!-- wp:html -->\n<div class="qp-interactive">'+S.selectedInteractiveHTML+'</div>\n<!-- /wp:html -->\n';
 
-  // Date: 10 days from now
   const pubDate=new Date();
   pubDate.setDate(pubDate.getDate()+10);
   const dateStr=pubDate.toISOString().slice(0,19);
 
+  const wp=async function(action,payload){
+    const r=await fetch('/api/wordpress',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({action,payload})});
+    if(!r.ok){const e=await r.json().catch(()=>({}));throw new Error(e.error||'HTTP '+r.status);}
+    return r.json();
+  };
+
   try{
-    // 1. Resolve category
+    btn.innerHTML='Verificando categoria...';
     let catId=1;
-    try{const cr=await fetch(url+'/wp-json/wp/v2/categories?search='+encodeURIComponent(S.cat)+'&per_page=1',{headers:{'Authorization':'Basic '+creds}});
-      if(cr.ok){const cats=await cr.json();if(cats.length)catId=cats[0].id;}}catch(e){}
+    try{const c=await wp('get_category',{cat:S.cat});catId=c.id||1;}catch(e){}
 
-    // 2. Resolve author by email
     let authorId=0;
-    try{const ar=await fetch(url+'/wp-json/wp/v2/users?search=editor%40quepasamedia.com&per_page=1',{headers:{'Authorization':'Basic '+creds}});
-      if(ar.ok){const authors=await ar.json();if(authors.length)authorId=authors[0].id;}}catch(e){}
+    try{const a=await wp('get_author',{email:'editor@quepasamedia.com'});authorId=a.id||0;}catch(e){}
 
-    // 3. Upload featured image if DALL-E image exists
     let featuredMediaId=0;
     if(S.generatedImageBase64){
       try{
         btn.innerHTML='Subiendo imagen...';
-        const imgBlob=await fetch(S.generatedImageBase64).then(r=>r.blob());
-        const isJpeg=S.generatedImageBase64.startsWith('data:image/jpeg');
-        const imgSlug=(slug||'imagen')+'-featured.'+(isJpeg?'jpg':'png');
-        const imgRes=await fetch(url+'/wp-json/wp/v2/media',{
-          method:'POST',
-          headers:{'Authorization':'Basic '+creds,'Content-Disposition':'attachment; filename="'+imgSlug+'"','Content-Type':isJpeg?'image/jpeg':'image/png'},
-          body:imgBlob
-        });
-        if(imgRes.ok){const imgData=await imgRes.json();featuredMediaId=imgData.id||0;}
+        const img=await wp('upload_image',{imageDataUrl:S.generatedImageBase64,slug:slug||'imagen'});
+        featuredMediaId=img.id||0;
       }catch(e){console.warn('Image upload failed:',e);}
     }
 
-    // 4. Create draft post
     btn.innerHTML='Creando borrador...';
-    const postBody={
-      title,
-      content:fullContent,
-      slug,
-      excerpt,
-      status:'future',
-      date:dateStr,
-      categories:[catId]
-    };
+    const postBody={title,content:fullContent,slug,excerpt,status:'future',date:dateStr,categories:[catId]};
     if(authorId)postBody.author=authorId;
     if(featuredMediaId)postBody.featured_media=featuredMediaId;
-
-    const r=await fetch(url+'/wp-json/wp/v2/posts',{
-      method:'POST',
-      headers:{'Authorization':'Basic '+creds,'Content-Type':'application/json'},
-      body:JSON.stringify(postBody)
-    });
-    if(r.ok){
-      const post=await r.json();
-      const editUrl=url+'/wp-admin/post.php?post='+post.id+'&action=edit';
-      res.className='wp-result ok';res.style.display='block';
-      const imgNote=featuredMediaId?' + imagen destacada':' (sin imagen — genera una con DALL-E primero)';
-      res.innerHTML='Borrador programado para '+pubDate.toLocaleDateString('es-MX',{day:'numeric',month:'long'})+imgNote+'. <a href="'+editUrl+'" target="_blank">Abrir en WordPress</a>';
-    }else{
-      const e=await r.json().catch(()=>({}));
-      res.className='wp-result err';res.style.display='block';
-      res.textContent='Error '+r.status+': '+(e.message||'no se pudo crear el borrador');
-    }
-  }catch(e){res.className='wp-result err';res.style.display='block';res.textContent='Error: '+e.message;}
+    const p=await wp('create_post',{post:postBody});
+    if(p.error){throw new Error(p.error);}
+    const imgNote=featuredMediaId?' + imagen destacada':' (sin imagen)';
+    res.className='wp-result ok';res.style.display='block';
+    res.innerHTML='Borrador programado para '+pubDate.toLocaleDateString('es-MX',{day:'numeric',month:'long'})+imgNote+'. <a href="'+p.editUrl+'" target="_blank">Abrir en WordPress</a>';
+  }catch(e){
+    res.className='wp-result err';res.style.display='block';
+    res.textContent='Error: '+e.message;
+  }
   btn.disabled=false;btn.innerHTML='Crear borrador en WordPress';
 }
 
@@ -1654,7 +1627,7 @@ function fileToBase64(file){
 function resetAll(){
   S={tipo:0,cat:'Agricultura',articleText:'',articleHTML:'',researchContext:'',
      imgPromptText:'',generatedImageBase64:'',
-     interactiveHTMLs:{tabla:'',infografia:'',juego:''},
+     interactiveHTMLs:{single:''},currentPlan:null,currentFmt:'',currentALL_FORMATS:[],
      selectedInteractive:'',selectedInteractiveHTML:'',currentStep:1};
   ['view-review','view-generating','view-imagen','view-interactive',
    'view-social','view-preview-final','view-wp'].forEach(v=>hide(v));
@@ -1664,7 +1637,8 @@ function resetAll(){
   $('meta-tipo').textContent='-';$('meta-words').textContent='-';
   $('meta-img-status').textContent='Pendiente';$('meta-int-status').textContent='Pendiente';
   $('wp-result').style.display='none';
-  ['tabla','infografia','juego'].forEach(t=>{const el=$('ic-'+t);if(el)el.classList.remove('selected');});
+  var sc=document.getElementById('ic-single');if(sc)sc.classList.remove('selected');
+  var sw=document.getElementById('ic-format-switcher');if(sw)sw.style.display='none';
   hide('interactive-selected-msg');
 }
 
