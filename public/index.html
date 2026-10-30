@@ -802,7 +802,7 @@ function goToStep(n){
   show(views[n]);
   setStep(n);
   if(n===3&&!S.imgPromptText)generateImgPrompt();
-  if(n===4&&!S.interactiveHTMLs.tabla)generateInteractives();
+  if(n===4&&!S.interactiveHTMLs.single)generateInteractives();
   if(n===5&&!$('copy-fb').value)generateSocialCopies();
   if(n===6)buildFinalPreview();
   if(n===7)populateWPSummary();
@@ -1165,7 +1165,7 @@ async function generateInteractiveSingle(apiKey,title,body,tipo,ALL_FORMATS,avoi
   try{
     $('interactive-load-msg').textContent='Claude eligiendo el mejor formato...';
     const d=await anthroFetch(apiKey,{
-      model:'claude-sonnet-4-6',max_tokens:2500,
+      model:'claude-sonnet-4-6',max_tokens:6000,
       messages:[{role:'user',content:'You are choosing the single best interactive widget for a Spanish-language agricultural article for Hispanic farmworkers.\n\nARTICLE TYPE: Tipo '+tipo+' (1=news brief, 2=practical guide, 3=program access, 4=community story, 5=data)\nARTICLE TITLE: '+title+'\nARTICLE BODY: '+body+'\n\nAVAILABLE FORMATS:\n'+ALL_FORMATS.map(f=>f.id+' ('+f.label+')').join(', ')+'\n\nDO NOT USE THESE (recently used, must pick something different): '+avoidList.join(', ')+'\n\nPick the SINGLE most valuable and engaging format for this specific article. Think about what would be most useful to a farmworker reading this article. Be creative and vary your choices - do not always default to quiz or tabla_comparativa.\n\nThen extract real data from the article to populate it.\n\nReturn ONLY valid JSON, no markdown:\n{\n  "chosen":"[format_id]",\n  "razon":"[one sentence why this is best for this article]",\n  "titulo":"[widget title in Spanish]",\n  "subtitulo":"[subtitle in Spanish]",\n  "headers":["Col1","Col2","Col3"],\n  "rows":[["val","val","val"],["val","val","val"],["val","val","val"],["val","val","val"],["val","val","val"]],\n  "checklist":[{"item":"[req]","ayuda":"[help]"},{"item":"...","ayuda":"..."},{"item":"...","ayuda":"..."},{"item":"...","ayuda":"..."},{"item":"...","ayuda":"..."}],\n  "calc":{"label":"[what we calculate]","campos":[{"id":"c1","label":"[field]","unit":"[unit]","default":10},{"id":"c2","label":"[field]","unit":"[unit]","default":100}],"resultado_prefix":"[prefix]","resultado_unit":"[unit]"},\n  "fechas":[{"mes":"Ene","evento":"[event]"},{"mes":"Feb","evento":"[event]"},{"mes":"Mar","evento":"[event]"},{"mes":"Abr","evento":"[event]"},{"mes":"May","evento":"[event]"},{"mes":"Jun","evento":"[event]"},{"mes":"Jul","evento":"[event]"},{"mes":"Ago","evento":"[event]"},{"mes":"Sep","evento":"[event]"},{"mes":"Oct","evento":"[event]"},{"mes":"Nov","evento":"[event]"},{"mes":"Dic","evento":"[event]"}],\n  "stats":[{"emoji":"🌱","valor":"450","sufijo":"+","etiqueta":"[label]"},{"emoji":"💧","valor":"50","sufijo":"%","etiqueta":"[label]"},{"emoji":"🌾","valor":"12","sufijo":"","etiqueta":"[label]"},{"emoji":"📋","valor":"3","sufijo":"","etiqueta":"[label]"}],\n  "pasos":[{"titulo":"[step]","desc":"[1 sentence]","emoji":"🌱"},{"titulo":"...","desc":"...","emoji":"📋"},{"titulo":"...","desc":"...","emoji":"✅"},{"titulo":"...","desc":"...","emoji":"🎯"}],\n  "glosario":[{"term":"[term]","def":"[plain def]"},{"term":"...","def":"..."},{"term":"...","def":"..."},{"term":"...","def":"..."},{"term":"...","def":"..."}],\n  "calendario":[{"mes":"Ene","icon":"❄️","nota":"[action]"},{"mes":"Feb","icon":"🌱","nota":"[action]"},{"mes":"Mar","icon":"🌿","nota":"[action]"},{"mes":"Abr","icon":"🌾","nota":"[action]"},{"mes":"May","icon":"☀️","nota":"[action]"},{"mes":"Jun","icon":"🌻","nota":"[action]"},{"mes":"Jul","icon":"💧","nota":"[action]"},{"mes":"Ago","icon":"🔥","nota":"[action]"},{"mes":"Sep","icon":"🍂","nota":"[action]"},{"mes":"Oct","icon":"📋","nota":"[action]"},{"mes":"Nov","icon":"🌧️","nota":"[action]"},{"mes":"Dic","icon":"❄️","nota":"[action]"}],\n  "preguntas":[{"p":"[question]?","ops":["[wrong]","[correct]","[wrong]","[wrong]"],"c":1,"exp":"[explanation]"},{"p":"[question]?","ops":["[wrong]","[wrong]","[correct]","[wrong]"],"c":2,"exp":"[explanation]"},{"p":"[question]?","ops":["[correct]","[wrong]","[wrong]","[wrong]"],"c":0,"exp":"[explanation]"},{"p":"[question]?","ops":["[wrong]","[correct]","[wrong]","[wrong]"],"c":1,"exp":"[explanation]"}],\n  "pares":[{"a":"[term]","b":"[def]"},{"a":"...","b":"..."},{"a":"...","b":"..."},{"a":"...","b":"..."}],\n  "verdaderofalso":[{"p":"[statement]","v":true,"exp":"[explanation]"},{"p":"...","v":false,"exp":"..."},{"p":"...","v":true,"exp":"..."},{"p":"...","v":false,"exp":"..."},{"p":"...","v":true,"exp":"..."}],\n  "orden":[{"paso":1,"texto":"[first step]"},{"paso":2,"texto":"[second]"},{"paso":3,"texto":"[third]"},{"paso":4,"texto":"[fourth]"},{"paso":5,"texto":"[fifth]"}]\n}'}]
     });
     let txt=(d.content&&d.content[0]&&d.content[0].text)||'{}';
@@ -1432,7 +1432,7 @@ async function regenerateSocial(platform){
   const rule=platform==='fb'
     ?'Facebook post: 150-250 chars + 5-7 hashtags including #TierraViva. Warm informative tone. Can start with emoji.'
     :platform==='ig'
-    ?'Instagram post: short hook + 8-12 hashtags (#TierraViva #AgriculturaNC #HispanosEnElCampo #CarolinaDelNorte #QuePassaMedia required). End with "Link en bio".'
+    ?'Instagram post: short hook + 8-12 hashtags (#TierraViva #AgriculturaNC #HispanosEnElCampo #CarolinaDelNorte #QuePasaMedia required). End with "Link en bio".'
     :'X/Twitter post: max 260 chars total, direct and punchy, 1-2 hashtags max (#TierraViva required), include quepasamedia.com link.';
   const elId=platform==='fb'?'copy-fb':platform==='ig'?'copy-ig':'copy-x';
   const cntId=platform==='fb'?'count-fb':platform==='ig'?'count-ig':'count-x';
@@ -1454,8 +1454,8 @@ async function generateSocialCopies(){
   show('social-loading');hide('social-content');
   const title=$('meta-title').value||S.articleText.split('\n')[0];
   const excerpt=S.articleText.split('\n').filter(l=>l.trim()).slice(1,3).join(' ').substring(0,200);
-  const fallbackFB='Nuevo articulo en Que Pasa Media sobre agricultura en Carolina del Norte.\n\nLee mas en quepasamedia.com/agricultura\n\n#TierraViva #AgriculturaNC #QuePassaMedia #ComunidadHispana';
-  const fallbackIG=title.substring(0,80)+'...\n\nLink en bio\n\n#TierraViva #AgriculturaNC #HispanosEnElCampo #CarolinaDelNorte #QuePassaMedia';
+  const fallbackFB='Nuevo articulo en Que Pasa Media sobre agricultura en Carolina del Norte.\n\nLee mas en quepasamedia.com/agricultura\n\n#TierraViva #AgriculturaNC #QuePasaMedia #ComunidadHispana';
+  const fallbackIG=title.substring(0,80)+'...\n\nLink en bio\n\n#TierraViva #AgriculturaNC #HispanosEnElCampo #CarolinaDelNorte #QuePasaMedia';
   const fallbackX=title.substring(0,200)+' quepasamedia.com/agricultura #TierraViva #AgriculturaNC';
   if(!apiKey){
     $('copy-fb').value=fallbackFB;$('copy-ig').value=fallbackIG;$('copy-x').value=fallbackX;
@@ -1465,7 +1465,7 @@ async function generateSocialCopies(){
   try{
     const d=await anthroFetch(apiKey,{
       model:'claude-sonnet-4-6',max_tokens:600,
-      messages:[{role:'user',content:'Generate three social media posts in Spanish for Que Pasa Media (serving Hispanic agricultural communities in '+detectLocation()+').\n\nARTICLE TITLE: '+title+'\nEXCERPT: '+excerpt+'\n\nRULES:\n- Warm, helpful tone for Hispanic community\n- Include #TierraViva in all\n- Facebook: 150-250 chars + 5-7 hashtags, can include emoji, informative tone\n- Instagram: short hook + 8-12 hashtags (#TierraViva #AgriculturaNC #HispanosEnElCampo #CarolinaDelNorte #QuePassaMedia required) + "Link en bio" at end\n- X/Twitter: max 260 chars, direct and punchy, 1-2 hashtags max, include article link placeholder\n\nRespond ONLY in JSON without markdown:\n{"fb":"...","ig":"...","x":"..."}'}]
+      messages:[{role:'user',content:'Generate three social media posts in Spanish for Que Pasa Media (serving Hispanic agricultural communities in '+detectLocation()+').\n\nARTICLE TITLE: '+title+'\nEXCERPT: '+excerpt+'\n\nRULES:\n- Warm, helpful tone for Hispanic community\n- Include #TierraViva in all\n- Facebook: 150-250 chars + 5-7 hashtags, can include emoji, informative tone\n- Instagram: short hook + 8-12 hashtags (#TierraViva #AgriculturaNC #HispanosEnElCampo #CarolinaDelNorte #QuePasaMedia required) + "Link en bio" at end\n- X/Twitter: max 260 chars, direct and punchy, 1-2 hashtags max, include article link placeholder\n\nRespond ONLY in JSON without markdown:\n{"fb":"...","ig":"...","x":"..."}'}]
     });
     let txt=(d.content&&d.content[0]&&d.content[0].text)||'{}';
     txt=txt.replace(/```json?|```/g,'').trim();
@@ -1514,7 +1514,7 @@ function populateWPSummary(){
   $('wp-prev-cat').textContent=S.cat;
   const extras=[];
   if(S.generatedImageBase64)extras.push('Imagen');
-  if(S.selectedInteractive)extras.push((S.selectedGameLabel||'Juego interactivo'));
+  if(S.selectedInteractive)extras.push((document.getElementById('ic-single-title')&&document.getElementById('ic-single-title').textContent)||'Elemento interactivo');
   extras.push('Copies FB+IG+X');
   $('wp-prev-extras').textContent=extras.join(' + ')||'Solo texto';
   $('wp-final-slug').value=$('meta-slug').value;
