@@ -207,7 +207,7 @@ a{color:var(--verde)}
     <div class="topbar-sub" style="color:rgba(255,255,255,.55);font-size:10px;letter-spacing:.12em;text-transform:uppercase;margin-top:2px">Agente Editorial &middot; Agricultura</div>
   </div>
   <div class="admin-badge">Admin</div>
-  <button onclick="resetAll()" style="margin-left:16px;padding:6px 14px;background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.3);border-radius:var(--radius);font-size:12px;color:#fff;cursor:pointer" onmouseover="this.style.background='rgba(255,255,255,.25)'" onmouseout="this.style.background='rgba(255,255,255,.15)'">🏠 Inicio</button>
+  <button onclick="newNote()" style="margin-left:16px;padding:6px 14px;background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.3);border-radius:var(--radius);font-size:12px;color:#fff;cursor:pointer" onmouseover="this.style.background='rgba(255,255,255,.25)'" onmouseout="this.style.background='rgba(255,255,255,.15)'">Nueva nota</button>
 </div>
 
 <div class="layout">
@@ -417,7 +417,7 @@ a{color:var(--verde)}
 
   <div class="btn-row">
     <button class="btn btn-green" onclick="goToStep(3)">Siguiente: Imagen principal →</button>
-    <button class="btn btn-outline" onclick="resetAll()">↩ Nuevo artículo</button>
+    <button class="btn btn-outline" onclick="newNote()">↩ Nueva nota</button>
   </div>
 </div>
 
@@ -688,6 +688,7 @@ a{color:var(--verde)}
         </div>
         <textarea id="end-copy-x" style="width:100%;min-height:110px;padding:14px;border:1px solid var(--border-dark);border-radius:var(--radius);font-size:14px;line-height:1.7;font-family:'DM Sans',sans-serif;color:var(--text);background:var(--bg);outline:none;resize:vertical" placeholder="Copy para X..."></textarea>
       </div>
+    <div class="btn-row"><button class="btn btn-green" onclick="newNote()">&#10010; Nueva nota</button></div>
   </div>
 </div>
 
@@ -1660,6 +1661,9 @@ function fileToBase64(file){
 }
 
 // RESET
+function newNote(){
+  if(!S.articleText||confirm('Se borrara la nota en curso (articulo, imagen, interactivo y copies de redes). Quieres empezar una nota nueva?'))resetAll();
+}
 function resetAll(){
   S={tipo:0,cat:'Agricultura',articleText:'',articleHTML:'',researchContext:'',
      imgPromptText:'',generatedImageBase64:'',
@@ -1676,6 +1680,12 @@ function resetAll(){
   var sc=document.getElementById('ic-single');if(sc)sc.classList.remove('selected');
   var sw=document.getElementById('ic-format-switcher');if(sw)sw.style.display='none';
   hide('interactive-selected-msg');
+  ['copy-fb','copy-ig','copy-x'].forEach(function(id){var el=document.getElementById(id);if(el)el.value='';});
+  var dp=document.getElementById('dalle-preview');if(dp)dp.removeAttribute('src');
+  hide('dalle-result-area');hide('dalle-error');
+  var ff=document.getElementById('fuente-file');if(ff)ff.value='';
+  var fl=document.getElementById('fuente-file-label');if(fl)fl.innerHTML='&#128206; Adjuntar PDF, Word o imagen como fuente &mdash; arrastra o haz clic';
+  var fst=document.getElementById('fuente-file-status');if(fst){fst.style.display='none';fst.textContent='';}
 }
 
 function downloadInteractive(type){
