@@ -665,6 +665,30 @@ a{color:var(--verde)}
     </div>
     <div class="wp-result" id="wp-result"></div>
   </div>
+  <div class="card">
+    <div class="card-header"><div class="card-icon blue">&#128227;</div><div><div class="card-title">Copies para redes</div><div class="card-subtitle">Listos para copiar y pegar en tu aplicaci&oacute;n de redes</div></div></div>
+      <div style="margin-bottom:16px">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">
+          <span style="font-size:12px;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:.08em">Facebook</span>
+          <button class="btn btn-outline btn-sm" id="btn-end-fb" onclick="copyText(document.getElementById('end-copy-fb').value,'btn-end-fb')">&#128203; Copiar</button>
+        </div>
+        <textarea id="end-copy-fb" style="width:100%;min-height:110px;padding:14px;border:1px solid var(--border-dark);border-radius:var(--radius);font-size:14px;line-height:1.7;font-family:'DM Sans',sans-serif;color:var(--text);background:var(--bg);outline:none;resize:vertical" placeholder="Copy de Facebook..."></textarea>
+      </div>
+      <div style="margin-bottom:16px">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">
+          <span style="font-size:12px;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:.08em">Instagram</span>
+          <button class="btn btn-outline btn-sm" id="btn-end-ig" onclick="copyText(document.getElementById('end-copy-ig').value,'btn-end-ig')">&#128203; Copiar</button>
+        </div>
+        <textarea id="end-copy-ig" style="width:100%;min-height:110px;padding:14px;border:1px solid var(--border-dark);border-radius:var(--radius);font-size:14px;line-height:1.7;font-family:'DM Sans',sans-serif;color:var(--text);background:var(--bg);outline:none;resize:vertical" placeholder="Copy de Instagram..."></textarea>
+      </div>
+      <div style="margin-bottom:16px">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">
+          <span style="font-size:12px;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:.08em">X</span>
+          <button class="btn btn-outline btn-sm" id="btn-end-x" onclick="copyText(document.getElementById('end-copy-x').value,'btn-end-x')">&#128203; Copiar</button>
+        </div>
+        <textarea id="end-copy-x" style="width:100%;min-height:110px;padding:14px;border:1px solid var(--border-dark);border-radius:var(--radius);font-size:14px;line-height:1.7;font-family:'DM Sans',sans-serif;color:var(--text);background:var(--bg);outline:none;resize:vertical" placeholder="Copy para X..."></textarea>
+      </div>
+  </div>
 </div>
 
 </main>
@@ -1491,9 +1515,10 @@ function populateWPSummary(){
   const extras=[];
   if(S.generatedImageBase64)extras.push('Imagen');
   if(S.selectedInteractive)extras.push((S.selectedGameLabel||'Juego interactivo'));
-  extras.push('Copies FB+IG');
+  extras.push('Copies FB+IG+X');
   $('wp-prev-extras').textContent=extras.join(' + ')||'Solo texto';
   $('wp-final-slug').value=$('meta-slug').value;
+  ['fb','ig','x'].forEach(function(k){var src=document.getElementById('copy-'+k),dst=document.getElementById('end-copy-'+k);if(src&&dst)dst.value=src.value;});
 }
 
 async function testWP(){
