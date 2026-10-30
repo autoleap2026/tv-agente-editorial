@@ -882,10 +882,11 @@ async function generateArticle(){
 
   // Cap research context to ~1500 chars to stay within token limits
   const researchTrimmed = researchCtx ? researchCtx.substring(0, 1500) : '';
-  const ctxBlock=researchTrimmed?('\n\nFUENTES VERIFICADAS (usa SOLO estos datos para hechos, nombres de programas, codigos y cifras - no inventes nada que no este aqui):\n'+researchTrimmed):'';
+  const ctxRule=fuente?'usa estos datos solo para complementar la FUENTE PRIMARIA DEL EDITOR (nombre oficial de un programa, codigo, definicion necesaria para entenderla), sin ampliar el tema ni agregar hechos, cifras o angulos que la fuente no trate; si algo contradice a la fuente primaria, prevalece la fuente primaria; si la fuente primaria es solo un enlace, usa estos datos para conocer su contenido':'usa SOLO estos datos para hechos, nombres de programas, codigos y cifras - no inventes nada que no este aqui';
+  const ctxBlock=researchTrimmed?('\n\nFUENTES VERIFICADAS ('+ctxRule+'):\n'+researchTrimmed):'';
   // Brief pause so the two API calls don't hit the rate limit in the same minute window
   await new Promise(r=>setTimeout(r,2000));
-  const fuenteBlock=fuente?'FUENTE PRIMARIA DEL EDITOR (cita esta fuente directamente en el articulo con su nombre o URL real - no la sustituyas por NRCS u otra agencia a menos que sea la misma fuente):\n'+fuente:'';
+  const fuenteBlock=fuente?'FUENTE PRIMARIA DEL EDITOR (el articulo se escribe sobre esta fuente: usa sus datos, cifras y citas, y atribuyela en el cuerpo con su nombre o URL real - no la sustituyas por NRCS u otra agencia a menos que sea la misma fuente. Las FUENTES VERIFICADAS solo la complementan):\n'+fuente:'';
   const userMsg='Escribe un articulo de Tipo '+S.tipo+' ('+TIPO_NAMES[S.tipo]+', '+TIPO_EXT[S.tipo]+' palabras) para la seccion de Agricultura de Que Pasa Media.\n\nTEMA: '+tema+'\nCATEGORIA: '+S.cat+'\n'+fuenteBlock+ctxBlock;
 
   try{
@@ -1578,6 +1579,10 @@ async function sendToWP(){
 // FILE TO FUENTE
 async function handleFuenteFile(file){
   if(!file)return;
+  if(file.size>3*1024*1024){
+    alert('El archivo pesa '+(file.size/1048576).toFixed(1)+' MB y el limite es 3 MB. Comprimelo o pega el texto en el campo Fuente.');
+    return;
+  }
   var status=document.getElementById('fuente-file-status');
   var label=document.getElementById('fuente-file-label');
   status.style.display='block';
@@ -1607,16 +1612,18 @@ async function handleFuenteFile(file){
     }
     if(extractedText.trim()){
       var existing=$('fuente').value.trim();
-      $('fuente').value=(existing?existing+'\n\n---\n\n':'')+extractedText.trim();
+      $('fuente').value=(existing?existing+'\n\n---\n\n':'')+'[Documento fuente: '+file.name+']\n'+extractedText.trim();
       status.style.color='#1e7c73';
       status.textContent='Texto extraido de '+file.name+' ('+extractedText.trim().length+' caracteres). Revisa el campo arriba.';
     }else{
       status.style.color='#92600A';
       status.textContent='No se pudo extraer texto. Puedes pegarlo manualmente arriba.';
+      alert('No se pudo extraer texto de '+file.name+'. Pega el contenido manualmente en el campo Fuente.');
     }
   }catch(e){
     status.style.color='#991B1B';
     status.textContent='Error: '+e.message;
+    alert('No se pudo leer '+file.name+': '+e.message+'. Guarda el documento como PDF o pega el texto en el campo Fuente.');
   }
 }
 function fileToBase64(file){
