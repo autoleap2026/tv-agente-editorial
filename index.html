@@ -1529,7 +1529,7 @@ async function sendToWP(){
     return blocks;
   }
 
-  let fullContent=toWPBlocks(S.articleHTML||'');
+  let fullContent=toWPBlocks((S.articleHTML||'').replace(/^\s*<h2>[\s\S]*?<\/h2>\s*/,''));
   if(S.selectedInteractiveHTML)fullContent+='\n<!-- wp:html -->\n<div class="qp-interactive">'+S.selectedInteractiveHTML+'</div>\n<!-- /wp:html -->\n';
 
   const pubDate=new Date();
